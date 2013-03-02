@@ -95,7 +95,7 @@ The following example takes a look at how power calculations can be carried out 
 
 A major assumption underlying the two-sample t-test is that the means of the two samples are normally distributed.  However, in the experiment described above, only one such mean for each group is produced.  Researchers could analyze the underlying structure of each sample group's token earning.  In this case, the underlying data is not normally distributed.  Are then these data suitable for a two-sample t-test?\\
 
-Suppose that we collect data on token earning prior to our experiment.  In this case the data from two randomly selected groups looks as follows
+Suppose that we collect data on token earning prior to our experiment.  In this case the data from two randomly selected groups looks as is shown in Figure~\ref{prob_1_raw_data} in Appendix A.  The data are clearly right skewed and look F, Chi-square, or exponentially distributed.  However, this does not disqualify these data from being analyzed with a two-sample t-test.  While the t-test is usually robust to departures from normality in large samples, it is costly for the company to run large experiments.  Despite the raw samples being non-normal, the two-sample t-test is valid if the mean difference between the two samples is normally distributed.
 
 One simple tool for power calculations is the~\href{http://cran.r-project.org/web/packages/pwr/index.html}{pwr} package found in the R language.
 
@@ -112,10 +112,10 @@ One simple tool for power calculations is the~\href{http://cran.r-project.org/we
 \bibliographystyle{plainnat}
 
 \newpage
-\section{Appendix 1}
+\section{Appendix A}
 
 \begin{figure}[h!]
-<<prepare-data, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in'>>=
+<<fig_1, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', cache=TRUE>>=
 library(ggplot2)
 library(reshape2)
 library(tikzDevice)
@@ -134,7 +134,51 @@ ggplot(raw.samples, aes(x = value)) +
   facet_grid(variable ~ . )
 @
 \caption{test caption}
+\label{prob_1_raw_data}
 \end{figure}
+
+\begin{figure}[h!]
+<<fig_2, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', warning=FALSE, cache=TRUE>>=
+library(ggplot2)
+library(reshape2)
+library(tikzDevice)
+
+data <- read.csv("C:/R_stuff/school/article/data.csv")
+
+# Take differences from B sample groups
+B <- 2000
+sample.size <- 30
+sample_diff <- rep(NA, B)
+for(i in 1:B){
+  set.seed(i)
+  sample_a <- sample(table(data$user_id), sample.size, replace = TRUE)
+  sample_b <- sample(table(data$user_id), sample.size, replace = TRUE)
+  sample_diff[i] <- mean(sample_a - sample_b)
+}
+
+# Convert badge means to a data.frame
+sample_diff <- as.data.frame(sample_diff)
+
+# Now lets check if it's t-distributed centered on mean(badge.means), looks normal distributed or t-dist with infinite DF
+t <- rt(10000, df = sample.size, ncp = mean(sample_diff))
+
+library(ggplot2)
+ggplot(sample_diff, aes(x = sample_diff)) +
+  geom_histogram(aes(y = ..density..)) +
+  stat_function(fun = dt,
+                args = c(df = sample.size,
+                         ncp = mean(sample_diff$sample_diff)),
+                colour = "red") +
+  stat_function(fun = dnorm,
+                args = c(mean = mean(sample_diff$sample_diff),
+                         sd = sd(sample_diff$sample_diff)),
+                colour = "blue") +
+  ggtitle("Histogram of mean badges earned within two weeks of membership\nplotted against theoretical t-distribution (red) and normal distribution (blue)")
+@
+\caption{test caption}
+\label{prob_1_raw_data}
+\end{figure}
+
 
 
 \end{document}
