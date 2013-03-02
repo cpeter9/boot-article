@@ -164,15 +164,22 @@ Power calculations are generally considered good pre-requisite for any designed 
 
 The following example takes a look at how power calculations can be carried out and verified by bootstrapping sample data.  In this case a web app company wants to perform an experiment on a business practice.  The company has found a relationship between earning tokens on the site and customer longevity and financial value.  The company decides that it would like to encourage its customers to earn more tokens by sending an email.  However, the company would also like to compare the effect of the email against a control group of customers that did not receive the email.  A two-sample t-test is selected to test for a difference between the mean number of tokens earned in the experiment group and control group.\\
 
-A major assumption underlying the two-sample t-test is that the two samples from come from normally distributed populations.  When this assumption is violated, distribution-free tests such as the Wilcoxon-Mann-Whitney test are commonly used. Researchers could analyze the underlying structure of each sample group's token earning.  In this case, the underlying data is not normally distributed.  Are then these data suitable for a two-sample t-test?\\
+A major assumption underlying the two-sample t-test is that the two samples from come from normally distributed populations.  When this assumption is violated, distribution-free tests such as the Wilcoxon-Mann-Whitney (WMW or Mann-Witney U) test are commonly used~\citep{skovlund}. It is well known that the two-sample t-test is robust to departures from normality when data are large, but how large?
 
-Suppose that we collect data on token earning prior to our experiment.  In this case the data from two randomly selected groups looks as is shown in Figure~\ref{prob_1_raw_data} in Appendix A.  The data are clearly right skewed and look F, Chi-square, or exponentially distributed.  However, this does not disqualify these data from being analyzed with a two-sample t-test.  While the t-test is usually robust to departures from normality in large samples, it is costly for the company to run large experiments.  Despite the raw samples being non-normal, the two-sample t-test is valid if the mean difference between the two samples is normally distributed.\\
+Suppose that we collect data on token earning prior to our experiment.  In this case the data from two randomly selected groups looks as is shown in Figure~\ref{prob_1_raw_data} in Appendix A.  The data are clearly right skewed and look F, Chi-square, or exponentially distributed. While the t-test is usually robust to departures from normality in large samples, it is costly for the company to run large experiments.  Using bootstrapping, we can resample data from the same data stream that will record the effect of the experiment.  This will allow us to take thousands of samples for varying samples sizes in order to compare power and Type I error rates between the two methods.  The two-sample t-test with pooled variances and with separate variances is also analyzed.  By bootstrapping we are granted a look at the robustness of the two-sample t-test for this data with respect to sample size and when it should be preferred to the WMW test.\\
+
+The standard two-sample t-test is shown below:
 
 \begin{align}
-t &= \frac{\widebar{d} - D_0}{s_d/\sqrt{n}}
+t &= \frac{\widebar{Y_1} - \widebar{Y_2}}{s_p\sqrt{\frac{1}{n_1} + \frac{1}{n_2}}}
 \end{align}
 
-In this case, the interest lies with $\widebar{d}$ and whether it meets the normal distributional requirement.\\
+The WMW statistic is calculated as follow:
+
+\begin{align}
+W &= \frac{\sum_{i=0}^{m-1}\sum_{j=0}^{n-1}I(x_i, y_j)}{mn}\\
+I(x_i, y_i) &= 
+\end{align}
 
 The following bootstrapping procedure was carried out.
 \begin{enumerate}
