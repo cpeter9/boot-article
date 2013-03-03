@@ -19,7 +19,7 @@ library(stringr)
 
 # Suppose
 
-sample.size <- 16
+sample.size <- 10000
 
 # Various normal distributions
 normal <- rnorm(sample.size, mean = 0, sd = 1)
@@ -30,6 +30,26 @@ normal_skinny <- rnorm(sample.size, mean = 0, sd = 0.5)
 uniform <- runif(sample.size, min = 0, max = 1)
 chisq <- rchisq(sample.size, df = 3)
 gamma <- rgamma(sample.size, shape = 2, rate = 2)
+
+dists <- as.data.frame(list(normal = normal, normal_wide = normal_wide, normal_skinny = normal_skinny,
+                   uniform = uniform, chisq = chisq, gamma = gamma))
+
+dists <- melt(dists)
+
+ggplot(dists, aes(x = value)) +
+  geom_density(fill = "blue", alpha = 0.5) +
+  scale_x_continuous(limits = c(-10, 10)) +
+  facet_wrap( ~ variable) +
+stat_function(fun = dnorm,
+              args = c(mean = 0,
+                       sd = 1),
+              colour = "red", size = 2)
+  stat_function(fun = dnorm,
+                args = c(mean = mean(sample_diff$sample_diff),
+                         sd = sd(sample_diff$sample_diff)),
+                colour = "blue") +
+  ggtitle("Histogram of mean badges earned within two weeks of membership\nplotted against theoretical t-distribution (red) and normal distribution (blue)")
+
 
 # Tests
 # 1. SW
