@@ -11,6 +11,9 @@ library(boot)
 # install.packages("tseries")
 library(tseries)
 
+library(reshape2)
+library(ggplot2)
+
 # Suppose
 
 sample.size <- 16
@@ -49,20 +52,81 @@ ad_test <- function(data, indices, n){
 
 ks_test <- function(data, indices, n){
   d <- data[indices[1:n]]
-  return(ks.test(d[indices], "prnom", alternative = "two.sided")$p.value)
+  return(ks.test(d[indices], "pnorm", alternative = "two.sided")$p.value)
 } 
 
 jb_test <- function(data, indices, n){
   d <- data[indices[1:n]]
-  return(ks.test(d[indices], "prnom", alternative = "two.sided")$p.value)
+  return(jarque.bera.test(d[indices])$p.value)
 }
 
 
 norm.ps <- boot(data = normal, statistic = sw_test, R = 100, n = sample.size)$t
 gamma.ps <- boot(data = gamma, statistic = sw_test, R = 100, n = sample.size)$t
 
+boot(data = normal, statistic = jb_test, R = 100, n = sample.size)
+
+# Loop over small sample sizes
+smallest.size <- 10
+largest.size <- 200
+size.by <- 5
+for(i in seq(smallest.size, largest.size, by = size.by)){
+  sample.size <- i
+  
+  # Various normal distributions
+  normal <- rnorm(sample.size, mean = 0, sd = 1)
+  normal_wide <- rnorm(sample.size, mean = 0, sd = 3)
+  normal_skinny <- rnorm(sample.size, mean = 0, sd = 0.5)
+  
+  # Other distributions
+  uniform <- runif(sample.size, min = 0, max = 1)
+  chisq <- rchisq(sample.size, df = 3)
+  gamma <- rgamma(sample.size, shape = 2, rate = 2)
+  
+  # SW test
+  norm.sw <- boot(data = normal, statistic = sw_test, R = 100, n = sample.size)$t
+  norm.wide.sw <- boot(data = normal_wide, statistic = sw_test, R = 100, n = sample.size)$t
+  norm.skinny.sw <- boot(data = normal_skinny, statistic = sw_test, R = 100, n = sample.size)$t
+  uniform.sw <- boot(data = uniform, statistic = sw_test, R = 100, n = sample.size)$t
+  chisq.sw <- boot(data = chisq, statistic = sw_test, R = 100, n = sample.size)$t
+  gamma.sw <- boot(data = gamma, statistic = sw_test, R = 100, n = sample.size)$t
+  
+  if(sample.size == smallest.size) {
+    temp <- as.data.frame(list(sample.size = sample.size,
+                               norm.sw = norm.sw, 
+                               norm.wide.sw = norm.wide.sw, 
+                               uniform.sw = uniform.sw, 
+                               chisq.sw = chisq.sw, 
+                               gamma.sw = gamma.sw))} else {
+    temp <- rbind(temp, as.data.frame(list(sample.size = sample.size,
+                               norm.sw = norm.sw, 
+                               norm.wide.sw = norm.wide.sw, 
+                               uniform.sw = uniform.sw, 
+                               chisq.sw = chisq.sw, 
+                               gamma.sw = gamma.sw)))}
+}
 
 
+output <- melt(temp, "sample.size")
+
+ggplot(output, aes(x = sample.size, y = value, colour = variable)) +
+  geom_smooth() +
+  geom_point() +
+  geom_hline(yintercept = 0.05, colour = "red")
+
+output <- aggregate(output$value, list(output$variable, output$sample.size), mean)
+  names(output) <- c("dist.test", "sample.size", "value")
+
+ggplot(output, aes(x = sample.size, y = value, colour = dist.test)) +
+  geom_smooth() +
+  geom_hline(yintercept = 0.05, colour = "red")
+
+
+ggplot(output, aes(x = value, fill = variable)) +
+  geom_density(alpha = 0.2) +
+  geom_vline(xintercept = 0.05, colour = "red")
+
+table(output$variable, output$value > 0.05)
 
 
 
