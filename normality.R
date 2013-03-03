@@ -40,118 +40,27 @@ ks.test(normal, "pnorm", alternative = "two.sided")
 ad.test(normal)
 jarque.bera.test(normal)
 
-sw_test <- function(data, indices){
-  return(shapiro.test(data[indices])$p.value)
-} 
-
-ad_test <- function(data, indices){
-  return(ad.test(data[indices])$p.value)
-} 
-
-ks_test <- function(data, indices){
-  return(ks.test(data[indices], "pnorm", alternative = "two.sided")$p.value)
-} 
-
-jb_test <- function(data, indices){
-  return(jarque.bera.test(data[indices])$p.value)
-}
-
-
-norm.ps <- boot(data = normal, statistic = sw_test, R = 100, n = sample.size)$t
-gamma.ps <- boot(data = gamma, statistic = sw_test, R = 100, n = sample.size)$t
-
-boot(data = normal, statistic = jb_test, R = 100, n = sample.size)
-
 # Loop over small sample sizes
 smallest.size <- 10
-largest.size <- 1000
-size.by <- 10
-boot.size <- 100
-for(i in seq(smallest.size, largest.size, by = size.by)){
-  set.seed(i)
-  sample.size <- i
-  
-  # Various normal distributions
-  normal <- rnorm(sample.size, mean = 0, sd = 1)
-  normal_wide <- rnorm(sample.size, mean = 0, sd = 3)
-  normal_skinny <- rnorm(sample.size, mean = 0, sd = 0.5)
-  
-  # Other distributions
-  uniform <- runif(sample.size, min = 0, max = 1)
-  chisq <- rchisq(sample.size, df = 3)
-  gamma <- rgamma(sample.size, shape = 2, rate = 2)
-  
-  # SW test
-  norm.sw <- boot(data = normal, statistic = sw_test, R = boot.size)$t
-  norm.wide.sw <- boot(data = normal_wide, statistic = sw_test, R = boot.size)$t
-  norm.skinny.sw <- boot(data = normal_skinny, statistic = sw_test, R = boot.size)$t
-  uniform.sw <- boot(data = uniform, statistic = sw_test, R = boot.size)$t
-  chisq.sw <- boot(data = chisq, statistic = sw_test, R = boot.size)$t
-  gamma.sw <- boot(data = gamma, statistic = sw_test, R = boot.size)$t
-  
-  if(sample.size == smallest.size) {
-    temp <- as.data.frame(list(sample.size = sample.size,
-                               norm.sw = norm.sw, 
-                               norm.wide.sw = norm.wide.sw, 
-                               uniform.sw = uniform.sw, 
-                               chisq.sw = chisq.sw, 
-                               gamma.sw = gamma.sw))} else {
-    temp <- rbind(temp, as.data.frame(list(sample.size = sample.size,
-                               norm.sw = norm.sw, 
-                               norm.wide.sw = norm.wide.sw, 
-                               uniform.sw = uniform.sw, 
-                               chisq.sw = chisq.sw, 
-                               gamma.sw = gamma.sw)))}
-}
-
-
-output <- melt(temp, "sample.size")
-
-ggplot(output, aes(x = sample.size, y = value, colour = variable)) +
-  geom_smooth() +
-  geom_hline(yintercept = 0.05, colour = "red")
-
-
-aggregate(output$value > 0.05, list(output$variable), table)
-
-B <- 100
-p_vals <- rep(NA, B)
-for(i in 1:B){
-  normal <- rnorm(150, mean = 0, sd = 1)
-  p_vals[i] <- shapiro.test(normal)$p.value
-}
-
-
-output <- aggregate(output$value, list(output$variable, output$sample.size), mean)
-  names(output) <- c("dist.test", "sample.size", "value")
-
-ggplot(output, aes(x = sample.size, y = value, colour = dist.test)) +
-  geom_smooth() +
-  geom_hline(yintercept = 0.05, colour = "red")
-
-
-ggplot(output, aes(x = value, fill = variable)) +
-  geom_density(alpha = 0.2) +
-  geom_vline(xintercept = 0.05, colour = "red")
-
-table(output$variable, output$value > 0.05)
-
-
-
-
-
-# Loop over small sample sizes
-smallest.size <- 10
-largest.size <- 1000
+largest.size <- 100
 size.by <- 10
 boot.size <- 100
 
-norm.sw <- rep(NA, boot.size)
-norm.wide.sw <- rep(NA, boot.size)
-norm.skinny.sw <- rep(NA, boot.size)
-uniform.sw <- rep(NA, boot.size)
-chisq.sw <- rep(NA, boot.size)
-gamma.sw <- rep(NA, boot.size)
+for(i in c(".sw", ".ks", ".ad", ".jb")){ # create fill vectors to put bootstapped p-values in
+  norm <- rep(NA, boot.size)
+  norm.wide <- rep(NA, boot.size)
+  norm.skinny <- rep(NA, boot.size)
+  uniform <- rep(NA, boot.size)
+  chisq <- rep(NA, boot.size)
+  gamma <- rep(NA, boot.size)
+  
+  if(i == ".sw") {p_fill <- as.data.frame(cbind(norm, norm.wide, norm.skinny, uniform, chisq, gamma))
+                 names(p_fill) <- paste(names(p_fill), i, sep = "")} else
+                 {temp <- as.data.frame(cbind(norm, norm.wide, norm.skinny, uniform, chisq, gamma))
+                  names(temp) <- paste(names(temp), i, sep = "")
+                  p_fill <- cbind(p_fill, temp)}
+}
+
 
 for(i in seq(smallest.size, largest.size, by = size.by)){
   sample.size <- i
@@ -168,27 +77,42 @@ for(i in seq(smallest.size, largest.size, by = size.by)){
   gamma <- rgamma(sample.size, shape = 2, rate = 2)
   
   # SW test
-  norm.sw[j] <- shapiro.test(normal)$p.value
-  norm.wide.sw[j] <- shapiro.test(normal_wide)$p.value
-  norm.skinny.sw[j] <- shapiro.test(normal_skinny)$p.value
-  uniform.sw[j] <- shapiro.test(uniform)$p.value
-  chisq.sw[j] <- shapiro.test(chisq)$p.value
-  gamma.sw[j] <- shapiro.test(gamma)$p.value
+  p_fill$norm.sw[j] <- shapiro.test(normal)$p.value
+  p_fill$norm.wide.sw[j] <- shapiro.test(normal_wide)$p.value
+  p_fill$norm.skinny.sw[j] <- shapiro.test(normal_skinny)$p.value
+  p_fill$uniform.sw[j] <- shapiro.test(uniform)$p.value
+  p_fill$chisq.sw[j] <- shapiro.test(chisq)$p.value
+  p_fill$gamma.sw[j] <- shapiro.test(gamma)$p.value
+  
+  # KS test
+  p_fill$norm.ks[j] <- ks.test(normal, "pnorm", alternative = "two.sided")$p.value
+  p_fill$norm.wide.ks[j] <- ks.test(normal_wide, "pnorm", alternative = "two.sided")$p.value
+  p_fill$norm.skinny.ks[j] <- ks.test(normal_skinny, "pnorm", alternative = "two.sided")$p.value
+  p_fill$uniform.ks[j] <- ks.test(uniform, "pnorm", alternative = "two.sided")$p.value
+  p_fill$chisq.ks[j] <- ks.test(chisq, "pnorm", alternative = "two.sided")$p.value
+  p_fill$gamma.ks[j] <- ks.test(gamma, "pnorm", alternative = "two.sided")$p.value
+  
+  # AD test
+  p_fill$norm.ad[j] <- ad.test(normal)$p.value
+  p_fill$norm.wide.ad[j] <- ad.test(normal_wide)$p.value
+  p_fill$norm.skinny.ad[j] <- ad.test(normal_skinny)$p.value
+  p_fill$uniform.ad[j] <- ad.test(uniform)$p.value
+  p_fill$chisq.ad[j] <- ad.test(chisq)$p.value
+  p_fill$gamma.ad[j] <- ad.test(gamma)$p.value
+  
+  # AD test
+  p_fill$norm.jb[j] <- jarque.bera.test(normal)$p.value
+  p_fill$norm.wide.jb[j] <- jarque.bera.test(normal_wide)$p.value
+  p_fill$norm.skinny.jb[j] <- jarque.bera.test(normal_skinny)$p.value
+  p_fill$uniform.jb[j] <- jarque.bera.test(uniform)$p.value
+  p_fill$chisq.jb[j] <- jarque.bera.test(chisq)$p.value
+  p_fill$gamma.jb[j] <- jarque.bera.test(gamma)$p.value
   }
   
   if(sample.size == smallest.size) {
-    temp <- as.data.frame(list(sample.size = sample.size,
-                               norm.sw = norm.sw, 
-                               norm.wide.sw = norm.wide.sw, 
-                               uniform.sw = uniform.sw, 
-                               chisq.sw = chisq.sw, 
-                               gamma.sw = gamma.sw))} else {
-                                 temp <- rbind(temp, as.data.frame(list(sample.size = sample.size,
-                                                                        norm.sw = norm.sw, 
-                                                                        norm.wide.sw = norm.wide.sw, 
-                                                                        uniform.sw = uniform.sw, 
-                                                                        chisq.sw = chisq.sw, 
-                                                                        gamma.sw = gamma.sw)))}
+    temp <- as.data.frame(cbind(sample.size = sample.size,
+                                p_fill))} else {
+                                 temp <- rbind(temp, cbind(sample.size, p_fill))}
 }
 
 output <- melt(temp, "sample.size")
