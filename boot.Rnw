@@ -155,7 +155,7 @@ theme_set(theme_grey(base_size = 9))
 \end{abstract}
 
 %----------------------------------------------------------------------------------------
-%	ARTICLE CONTENTS
+%   ARTICLE CONTENTS
 %----------------------------------------------------------------------------------------
 
 \section{Verification of power calculations}
@@ -177,19 +177,39 @@ t &= \frac{\widebar{Y_1} - \widebar{Y_2}}{s_p\sqrt{\frac{1}{n_1} + \frac{1}{n_2}
 The WMW statistic is calculated as follow:
 
 \begin{align}
-W &= \frac{\sum_{i=0}^{m-1}\sum_{j=0}^{n-1}I(x_i, y_j)}{mn}\\
-I(x_i, y_i) &= 
+W &= \frac{\sum_{i=0}^{m-1}\sum_{j=0}^{n-1}I(x_i, y_j)}{mn} && \text{where}\\
+I(x_i, y_i) &=
+  \begin{array}{l}
+    1 : x_i > y_j,\\
+    0 : otherwise
+  \end{array}
 \end{align}
 
-The following bootstrapping procedure was carried out.
+The {\it W} statistic as formulated above is an estimator of P$\left[X > Y\right]$.\\
+
+
+In order to assess type 1 error rates:
 \begin{enumerate}
-\item Take two random samples of the token data with replacement with sample size thirty each.
+\item Take two random samples of the token data with replacement with for sample sizes $1\ldots 200$ by 10.
 \item Take the mean of the differences between the two samples.
 \item Repeat steps 1 and 2 {\it B} times.  In this case 2,000 bootstrap samples were taken for each sample and 2,000 mean differences were calculated.
 \item Plot a histogram of the mean differences against a theoretical normal and t distributions.
 \end{enumerate}
 
-The results in Figure~\ref{prob_1_means} in Appendix A show that the mean differences are indeed normally distributed.  The histogram of mean differences appears to visually approximate a normal distribution.  Increasing the number of bootstrap samples taken causes the histogram to converge to normal with no recognizable difference.  Therefore, the assumption of normality is met in this case of two-sample t-test.\\
+To prove the method, Figure~\ref{prob_1_rnorm} shows type 1 error rate for the two-sample t-test and WMW test in sample sizes ranging from 10 to 1000 with 500 bootstrap samples and tests performed at each sample size.  Figure\\
+
+% There are these cases:
+% 1. normal unequal variances {power, type 1}: t.test, t.test unequal, wmw
+% 2. actual data {power, type 1}: t.test, t.test unequal, wmw
+%
+%
+%
+%
+%
+%
+
+
+The results in Figure~\ref{prob_1_data} in Appendix A show that the mean differences are indeed normally distributed.  The histogram of mean differences appears to visually approximate a normal distribution.  Increasing the number of bootstrap samples taken causes the histogram to converge to normal with no recognizable difference.  Therefore, the assumption of normality is met in this case of two-sample t-test.\\
 
 Many statistical tools such as analysis of variance and linear regression require assumptions of normality.  If these assumptions are not met these tools are not valid and may be biased without further transformation of data or adjustments to standard errors.  Bootstrapping is a simple way, often overlooked, to check distributional assumptions.  The general procedure is simple:\\
 
@@ -200,8 +220,6 @@ Many statistical tools such as analysis of variance and linear regression requir
 \end{enumerate}
 
 Another assumption requred for the two-sample t-test to be valid is that the standard deviation of the differences is $\chi^{2}$ distributed with posi
-
-Though we've 
 
 One simple tool for power calculations is the~\href{http://cran.r-project.org/web/packages/pwr/index.html}{pwr} package found in the R language.
 
@@ -244,47 +262,170 @@ ggplot(raw.samples, aes(x = value)) +
 \end{figure}
 
 \begin{figure}[h!]
-<<fig_2, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', warning=FALSE, cache=TRUE>>=
+<<type1error, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', warning=FALSE, cache=TRUE>>=
+library(ggplot2)
+library(reshape2)
+library(tikzDevice)
+
+B <- 200
+t_p_vals <- rep(NA, B)
+t_unequal_p_vals <- rep(NA, B)
+wmw_p_vals <- rep(NA, B)
+t_p_vals_pwr <- rep(NA, B)
+t_unequal_p_vals_pwr <- rep(NA, B)
+wmw_p_vals_pwr <- rep(NA, B)
+
+begin <- 10; end <- 200; move_by <- 10
+t_type_1 <- rep(NA, length(seq(begin, end, move_by)))
+t_unequal_type_1 <- rep(NA, length(seq(begin, end, move_by)))
+wmw_type_1 <- rep(NA, length(seq(begin, end, move_by)))
+t_pwr <- rep(NA, length(seq(begin, end, move_by)))
+t_unequal_pwr <- rep(NA, length(seq(begin, end, move_by)))
+wmw_pwr <- rep(NA, length(seq(begin, end, move_by)))
+
+for(j in seq(begin, end, move_by)){
+  sample.size <- j
+for(i in 1:B){
+  
+  sample_a <- rnorm(sample.size, mean = 4, sd = 1)
+  sample_b <- rnorm(sample.size, mean = 4, sd = 3)
+  
+  sample_c <- rnorm(sample.size, mean = 4, sd = 1)
+  sample_d <- rnorm(sample.size, mean = 4 * 1.1, sd = 3) # thirty percent increase in mean
+
+  t_p_vals[i] <- t.test(sample_a, sample_b, alternative = "two.sided", var.equal = TRUE, conf.level = 0.95)$p.value
+  t_unequal_p_vals[i] <- t.test(sample_a, sample_b, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)$p.value
+  wmw_p_vals[i] <- wilcox.test(sample_a, sample_b, alternative = "two.sided", conf.level = 0.95)$p.value
+  
+  t_p_vals_pwr[i] <- t.test(sample_c, sample_d, alternative = "two.sided", var.equal = TRUE, conf.level = 0.95)$p.value
+  t_unequal_p_vals_pwr[i] <- t.test(sample_c, sample_d, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)$p.value
+  wmw_p_vals_pwr[i] <- wilcox.test(sample_c, sample_d, alternative = "two.sided", conf.level = 0.95)$p.value
+  }
+t_type_1[j/move_by] <- ifelse(is.na(table(t_p_vals <= 0.05)[2]), 0, table(t_p_vals <= 0.05)[2]) / B
+t_unequal_type_1[j/move_by] <- ifelse(is.na(table(t_unequal_p_vals <= 0.05)[2]), 0, table(t_unequal_p_vals <= 0.05)[2]) / B
+wmw_type_1[j/move_by] <- ifelse(is.na(table(wmw_p_vals <= 0.05)[2]), 0, table(wmw_p_vals <= 0.05)[2]) / B
+  
+t_pwr[j/move_by] <- ifelse(is.na(table(t_p_vals_pwr <= 0.05)[2]), B, table(t_p_vals_pwr <= 0.05)[2]) / B
+t_unequal_pwr[j/move_by] <- ifelse(is.na(table(t_unequal_p_vals_pwr <= 0.05)[2]), B, table(t_unequal_p_vals_pwr <= 0.05)[2]) / B
+wmw_pwr[j/move_by] <- ifelse(is.na(table(wmw_p_vals_pwr <= 0.05)[2]), B, table(wmw_p_vals_pwr <= 0.05)[2]) / B
+}
+
+output <- as.data.frame(list(t_test = t_type_1, t_test_unequal = t_unequal_type_1, wmw_test = wmw_type_1))
+output <- melt(output)
+output$sample.size <- seq(begin, end, move_by)
+
+ggplot(output, aes(x = sample.size, y = value, colour = variable)) +
+  geom_smooth() +
+  geom_point()
+@
+\caption{test caption}
+\label{prob_1_rnorm_type1}
+\end{figure}
+
+
+\begin{figure}[h!]
+<<power, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', warning=FALSE, cache=TRUE>>=
+library(ggplot2)
+library(reshape2)
+library(tikzDevice)
+
+B <- 200
+t_p_vals <- rep(NA, B)
+t_unequal_p_vals <- rep(NA, B)
+wmw_p_vals <- rep(NA, B)
+t_p_vals_pwr <- rep(NA, B)
+t_unequal_p_vals_pwr <- rep(NA, B)
+wmw_p_vals_pwr <- rep(NA, B)
+
+begin <- 10; end <- 200; move_by <- 10
+t_type_1 <- rep(NA, length(seq(begin, end, move_by)))
+t_unequal_type_1 <- rep(NA, length(seq(begin, end, move_by)))
+wmw_type_1 <- rep(NA, length(seq(begin, end, move_by)))
+t_pwr <- rep(NA, length(seq(begin, end, move_by)))
+t_unequal_pwr <- rep(NA, length(seq(begin, end, move_by)))
+wmw_pwr <- rep(NA, length(seq(begin, end, move_by)))
+
+for(j in seq(begin, end, move_by)){
+  sample.size <- j
+for(i in 1:B){
+  
+  sample_a <- rnorm(sample.size, mean = 4, sd = 1)
+  sample_b <- rnorm(sample.size, mean = 4, sd = 3)
+  
+  sample_c <- rnorm(sample.size, mean = 4, sd = 1)
+  sample_d <- rnorm(sample.size, mean = 4 * 1.1, sd = 3) # thirty percent increase in mean
+
+  t_p_vals[i] <- t.test(sample_a, sample_b, alternative = "two.sided", var.equal = TRUE, conf.level = 0.95)$p.value
+  t_unequal_p_vals[i] <- t.test(sample_a, sample_b, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)$p.value
+  wmw_p_vals[i] <- wilcox.test(sample_a, sample_b, alternative = "two.sided", conf.level = 0.95)$p.value
+  
+  t_p_vals_pwr[i] <- t.test(sample_c, sample_d, alternative = "two.sided", var.equal = TRUE, conf.level = 0.95)$p.value
+  t_unequal_p_vals_pwr[i] <- t.test(sample_c, sample_d, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)$p.value
+  wmw_p_vals_pwr[i] <- wilcox.test(sample_c, sample_d, alternative = "two.sided", conf.level = 0.95)$p.value
+  }
+t_type_1[j/move_by] <- ifelse(is.na(table(t_p_vals <= 0.05)[2]), 0, table(t_p_vals <= 0.05)[2]) / B
+t_unequal_type_1[j/move_by] <- ifelse(is.na(table(t_unequal_p_vals <= 0.05)[2]), 0, table(t_unequal_p_vals <= 0.05)[2]) / B
+wmw_type_1[j/move_by] <- ifelse(is.na(table(wmw_p_vals <= 0.05)[2]), 0, table(wmw_p_vals <= 0.05)[2]) / B
+  
+t_pwr[j/move_by] <- ifelse(is.na(table(t_p_vals_pwr <= 0.05)[2]), B, table(t_p_vals_pwr <= 0.05)[2]) / B
+t_unequal_pwr[j/move_by] <- ifelse(is.na(table(t_unequal_p_vals_pwr <= 0.05)[2]), B, table(t_unequal_p_vals_pwr <= 0.05)[2]) / B
+wmw_pwr[j/move_by] <- ifelse(is.na(table(wmw_p_vals_pwr <= 0.05)[2]), B, table(wmw_p_vals_pwr <= 0.05)[2]) / B
+}
+
+output <- as.data.frame(list(t_test_pwr = t_pwr, t_test_unequal_pwr = t_unequal_pwr, wmw_test_pwr = wmw_pwr))
+output <- melt(output)
+output$sample.size <- seq(begin, end, move_by)
+
+ggplot(output, aes(x = sample.size, y = value, colour = variable)) +
+  geom_smooth() +
+  geom_point()
+@
+\caption{test caption}
+\label{prob_1_power}
+\end{figure}
+
+\newpage
+\begin{figure}[h!]
+<<fig_3, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', warning=FALSE, cache=TRUE>>=
 library(ggplot2)
 library(reshape2)
 library(tikzDevice)
 
 data <- read.csv("C:/R_stuff/school/article/data.csv")
 
-# Take differences from B sample groups
-B <- 2000
-sample.size <- 30
-sample_diff <- rep(NA, B)
+B <- 200
+t_p_vals <- rep(NA, B)
+wmw_p_vals <- rep(NA, B)
+
+begin <- 10; end <- 200; move_by <- 10
+t_type_1 <- rep(NA, length(seq(begin, end, move_by)))
+wmw_type_1 <- rep(NA, length(seq(begin, end, move_by)))
+
+for(j in seq(begin, end, move_by)){
+  sample.size <- j 
 for(i in 1:B){
-  set.seed(i)
+  
   sample_a <- sample(table(data$user_id), sample.size, replace = TRUE)
   sample_b <- sample(table(data$user_id), sample.size, replace = TRUE)
-  sample_diff[i] <- mean(sample_a - sample_b)
+
+  t_p_vals[i] <- t.test(sample_a, sample_b, alternative = "two.sided", var.equal = TRUE, conf.level = 0.95)$p.value
+  wmw_p_vals[i] <- wilcox.test(sample_a, sample_b, alternative = "two.sided", conf.level = 0.95)$p.value
+  }
+t_type_1[j/move_by] <- ifelse(is.na(table(t_p_vals <= 0.05)[2]), 0, table(t_p_vals <= 0.05)[2]) / B
+wmw_type_1[j/move_by] <- ifelse(is.na(table(wmw_p_vals <= 0.05)[2]), 0, table(wmw_p_vals <= 0.05)[2]) / B
 }
 
-# Convert badge means to a data.frame
-sample_diff <- as.data.frame(sample_diff)
+output <- as.data.frame(list(t_test = t_type_1, wmw_test = wmw_type_1))
+output <- melt(output)
+output$sample.size <- seq(begin, end, move_by)
 
-# Now lets check if it's t-distributed centered on mean(badge.means), looks normal distributed or t-dist with infinite DF
-t <- rt(10000, df = sample.size, ncp = mean(sample_diff))
-
-library(ggplot2)
-ggplot(sample_diff, aes(x = sample_diff)) +
-  geom_histogram(aes(y = ..density..)) +
-  stat_function(fun = dt,
-                args = c(df = sample.size,
-                         ncp = mean(sample_diff$sample_diff)),
-                colour = "red") +
-  stat_function(fun = dnorm,
-                args = c(mean = mean(sample_diff$sample_diff),
-                         sd = sd(sample_diff$sample_diff)),
-                colour = "blue") +
-  ggtitle("Histogram of mean badges earned within two weeks of membership\nplotted against theoretical t-distribution (red) and normal distribution (blue)")
+ggplot(output, aes(x = sample.size, y = value, colour = variable)) +
+  geom_smooth() +
+  geom_point()
 @
 \caption{test caption}
-\label{prob_1_means}
+\label{prob_1_data}
 \end{figure}
-
 
 
 \end{document}
