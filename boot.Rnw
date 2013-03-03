@@ -164,9 +164,12 @@ Power calculations are generally considered good pre-requisite for any designed 
 
 The following example takes a look at how power calculations can be carried out and verified by bootstrapping sample data.  In this case a web app company wants to perform an experiment on a business practice.  The company has found a relationship between earning tokens on the site and customer longevity and financial value.  The company decides that it would like to encourage its customers to earn more tokens by sending an email.  However, the company would also like to compare the effect of the email against a control group of customers that did not receive the email.  A two-sample t-test is selected to test for a difference between the mean number of tokens earned in the experiment group and control group.\\
 
-A major assumption underlying the two-sample t-test is that the two samples from come from normally distributed populations.  When this assumption is violated, distribution-free tests such as the Wilcoxon-Mann-Whitney (WMW or Mann-Witney U) test are commonly used~\citep{skovlund}. It is well known that the two-sample t-test is robust to departures from normality when data are large, but how large?\\
+A major assumption underlying the two-sample t-test is that the two samples from come from normally distributed populations.  When this assumption is violated, distribution-free tests such as the Wilcoxon-Mann-Whitney (WMW or Mann-Witney U) test are commonly 
+used \citep{skovlund01}. It is well known that the two-sample t-test is robust to departures from normality when data are large, but how large?\\
 
-Suppose that we collect data on token earning prior to our experiment.  In this case the data from two randomly selected groups looks as is shown in Figure~\ref{prob_1_raw_data} in Appendix A.  The data are clearly right skewed and look F, Chi-square, or exponentially distributed. While the t-test is usually robust to departures from normality in large samples, it is costly for the company to run large experiments.  Using bootstrapping, we can resample data from the same data stream that will record the effect of the experiment.  This will allow us to take thousands of samples for varying samples sizes in order to compare power and Type I error rates between the two methods.  The two-sample t-test with pooled variances and with separate variances is also analyzed.  By bootstrapping we are granted a look at the robustness of the two-sample t-test for this data with respect to sample size and when it should be preferred to the WMW test.\\
+ 
+
+Suppose that we collect data on token earning prior to our experiment.  In this case the data from two randomly selected groups looks as is shown in Figure~\ref{fig:prob_1_raw_data} in Appendix A.  The data are clearly right skewed and look F, Chi-square, or exponentially distributed. While the t-test is usually robust to departures from normality in large samples, it is costly for the company to run large experiments.  Using bootstrapping, we can resample data from the same data stream that will record the effect of the experiment.  This will allow us to take thousands of samples for varying samples sizes in order to compare power and Type I error rates between the two methods.  The two-sample t-test with pooled variances and with separate variances is also analyzed.  By bootstrapping we are granted a look at the robustness of the two-sample t-test for this data with respect to sample size and when it should be preferred to the WMW test.\\
 
 The standard two-sample t-test is shown below:
 
@@ -225,8 +228,6 @@ Power calculations were also performed for all three test variations on the comp
 \section{Bootstrapping for cross-validation}
 
 
-~\citep{Nobody06}.
-
 \bibliography{boot_biblio}{}
 \bibliographystyle{plainnat}
 
@@ -234,7 +235,7 @@ Power calculations were also performed for all three test variations on the comp
 \section{Appendix A}
 
 \begin{figure}[h!]
-<<fig_1, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='3in', out.height='3in', cache=TRUE>>=
+<<fig_1, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='3in', out.height='3in', cache=FALSE>>=
 library(ggplot2)
 library(reshape2)
 library(tikzDevice)
@@ -253,7 +254,7 @@ ggplot(raw.samples, aes(x = value)) +
   facet_grid(variable ~ . )
 @
 \caption{test caption}
-\label{prob_1_raw_data}
+\label{fig:prob_1_raw_data}
 \end{figure}
 
 \begin{figure}[h!]
@@ -486,6 +487,7 @@ ggplot(output, aes(x = sample.size, y = value, colour = variable)) +
 \caption{test caption}
 \label{raw_data_power}
 \end{figure}
+
 
 
 \end{document}
