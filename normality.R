@@ -138,3 +138,68 @@ table(output$variable, output$value > 0.05)
 
 
 
+
+
+# Loop over small sample sizes
+smallest.size <- 10
+largest.size <- 1000
+size.by <- 10
+boot.size <- 100
+
+norm.sw <- rep(NA, boot.size)
+norm.wide.sw <- rep(NA, boot.size)
+norm.skinny.sw <- rep(NA, boot.size)
+uniform.sw <- rep(NA, boot.size)
+chisq.sw <- rep(NA, boot.size)
+gamma.sw <- rep(NA, boot.size)
+
+for(i in seq(smallest.size, largest.size, by = size.by)){
+  sample.size <- i
+  
+  for(j in 1:boot.size){
+  # Various normal distributions
+  normal <- rnorm(sample.size, mean = 0, sd = 1)
+  normal_wide <- rnorm(sample.size, mean = 0, sd = 3)
+  normal_skinny <- rnorm(sample.size, mean = 0, sd = 0.5)
+  
+  # Other distributions
+  uniform <- runif(sample.size, min = 0, max = 1)
+  chisq <- rchisq(sample.size, df = 3)
+  gamma <- rgamma(sample.size, shape = 2, rate = 2)
+  
+  # SW test
+  norm.sw[j] <- shapiro.test(normal)$p.value
+  norm.wide.sw[j] <- shapiro.test(normal_wide)$p.value
+  norm.skinny.sw[j] <- shapiro.test(normal_skinny)$p.value
+  uniform.sw[j] <- shapiro.test(uniform)$p.value
+  chisq.sw[j] <- shapiro.test(chisq)$p.value
+  gamma.sw[j] <- shapiro.test(gamma)$p.value
+  }
+  
+  if(sample.size == smallest.size) {
+    temp <- as.data.frame(list(sample.size = sample.size,
+                               norm.sw = norm.sw, 
+                               norm.wide.sw = norm.wide.sw, 
+                               uniform.sw = uniform.sw, 
+                               chisq.sw = chisq.sw, 
+                               gamma.sw = gamma.sw))} else {
+                                 temp <- rbind(temp, as.data.frame(list(sample.size = sample.size,
+                                                                        norm.sw = norm.sw, 
+                                                                        norm.wide.sw = norm.wide.sw, 
+                                                                        uniform.sw = uniform.sw, 
+                                                                        chisq.sw = chisq.sw, 
+                                                                        gamma.sw = gamma.sw)))}
+}
+
+output <- melt(temp, "sample.size")
+
+ggplot(output, aes(x = sample.size, y = value, colour = variable)) +
+  geom_smooth() +
+  geom_hline(yintercept = 0.05, colour = "red")
+
+
+
+
+
+
+
