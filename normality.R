@@ -14,6 +14,9 @@ library(tseries)
 library(reshape2)
 library(ggplot2)
 
+# install.packages("stringr")
+library(stringr)
+
 # Suppose
 
 sample.size <- 16
@@ -116,6 +119,21 @@ for(i in seq(smallest.size, largest.size, by = size.by)){
 }
 
 output <- melt(temp, "sample.size")
+output$variable <- as.character(output$variable)
+
+# seperate.tests
+substrRight <- function(x, n){
+  substr(x, nchar(x) - n + 1, nchar(x))
+}
+
+substrLeft <- function(x, n){
+  substr(x, 1, nchar(x) - n)
+}
+
+output$test <- substrRight(output$variable, 2)
+output$test <- substrRight(output$variable, 2)
+
+
 
 ggplot(output, aes(x = sample.size, y = value, colour = variable)) +
   geom_smooth() +
