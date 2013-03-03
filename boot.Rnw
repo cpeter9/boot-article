@@ -288,16 +288,23 @@ T &= sup_x|F(x) - F_n(x)|
 
 \subsubsection{Anderson-Darling Test}
 
-The Anderson-Darling test (AD) is another EDF-type test.  The test is a variant of the popular Cramer-von Mises (CVM) test.  The AD test statistic is of the form $\int_{-\infty}^{\infty}[F_n(x) - \phi(x)]^2\psi(t)$d{\it t}, where $\psi(t)$ is a weight function of the Cramer-von Mises class.  The weight function is what specifically differentiates the AD test from the CVM test.  It is of the form $\psi = [(\phi(x))(1 - \phi(x))]^{-1}$.  This variate of weight function allows the AD test to place greater importance on differences at the tails of the sample distribution.  The AD test can be computed as:\\
+The Anderson-Darling test (AD) is another EDF-type test.  The test is a variant of the popular Cramer-von Mises (CVM) test~\citep{farrell2006comprehensive}.  The AD test statistic is of the form $\int_{-\infty}^{\infty}[F_n(x) - \phi(x)]^2\psi(t)$d{\it t}, where $\psi(t)$ is a weight function of the Cramer-von Mises class.  The weight function is what specifically differentiates the AD test from the CVM test.  It is of the form $\psi = [(\phi(x))(1 - \phi(x))]^{-1}$.  This variate of weight function allows the AD test to place greater importance on differences at the tails of the sample distribution.  The AD test can be computed as:\\
 
 \begin{align}
-\text{AD} = \left(\frac{1}{n}\right)\sum_{i=1}^{n}(2i - 1)\text{log}[z_i + \text{log}(1 - z_{n+1-i})] - n
+\text{AD} &= \left(\frac{1}{n}\right)\sum_{i=1}^{n}(2i - 1)\text{log}[z_i + \text{log}(1 - z_{n+1-i})] - n
 \end{align}
 
 where $z_i = \phi(y_{(i)})$ with $y_{(i)} = (x_{(i)} - \widebar{x}) / s$.
 
+\subsubsection{Jarque-Bera}
 
+The Jarque-Bera test, formalized in 1987, is considered part of third type of statistics that test for departures from normality.  These tests are called Moment tests and focus on combinations of sample moments as compares to those of the theoretical normal distribution.  The Jarque-Bera test is given as follows:\\
 
+\begin{align}
+\text{JB} &= n \left(\frac{(\sqrt(b_1))^2}{6} + \frac{(b_2 - 3)^2}{24}\right)
+\end{align}
+
+The Jarque-Bera test is very simple to compute and measures sample kurtosis and skewness against theoretical kurtosis and skewness from a normal distribution.\\
 
 \section{Bootstrapping for cross-validation}
 
