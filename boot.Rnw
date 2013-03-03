@@ -164,7 +164,7 @@ Power calculations are generally considered good pre-requisite for any designed 
 
 The following example takes a look at how power calculations can be carried out and verified by bootstrapping sample data.  In this case a web app company wants to perform an experiment on a business practice.  The company has found a relationship between earning tokens on the site and customer longevity and financial value.  The company decides that it would like to encourage its customers to earn more tokens by sending an email.  However, the company would also like to compare the effect of the email against a control group of customers that did not receive the email.  A two-sample t-test is selected to test for a difference between the mean number of tokens earned in the experiment group and control group.\\
 
-A major assumption underlying the two-sample t-test is that the two samples from come from normally distributed populations.  When this assumption is violated, distribution-free tests such as the Wilcoxon-Mann-Whitney (WMW or Mann-Witney U) test are commonly used~\citep{skovlund}. It is well known that the two-sample t-test is robust to departures from normality when data are large, but how large?
+A major assumption underlying the two-sample t-test is that the two samples from come from normally distributed populations.  When this assumption is violated, distribution-free tests such as the Wilcoxon-Mann-Whitney (WMW or Mann-Witney U) test are commonly used~\citep{skovlund}. It is well known that the two-sample t-test is robust to departures from normality when data are large, but how large?\\
 
 Suppose that we collect data on token earning prior to our experiment.  In this case the data from two randomly selected groups looks as is shown in Figure~\ref{prob_1_raw_data} in Appendix A.  The data are clearly right skewed and look F, Chi-square, or exponentially distributed. While the t-test is usually robust to departures from normality in large samples, it is costly for the company to run large experiments.  Using bootstrapping, we can resample data from the same data stream that will record the effect of the experiment.  This will allow us to take thousands of samples for varying samples sizes in order to compare power and Type I error rates between the two methods.  The two-sample t-test with pooled variances and with separate variances is also analyzed.  By bootstrapping we are granted a look at the robustness of the two-sample t-test for this data with respect to sample size and when it should be preferred to the WMW test.\\
 
@@ -188,40 +188,35 @@ I(x_i, y_i) &=
 The {\it W} statistic as formulated above is an estimator of P$\left[X > Y\right]$.\\
 
 
-In order to assess type 1 error rates:
+In order to assess power and type 1 error rates by sample size:
 \begin{enumerate}
-\item Take two random samples of the token data with replacement with for sample sizes $1\ldots 200$ by 10.
-\item Take the mean of the differences between the two samples.
-\item Repeat steps 1 and 2 {\it B} times.  In this case 2,000 bootstrap samples were taken for each sample and 2,000 mean differences were calculated.
-\item Plot a histogram of the mean differences against a theoretical normal and t distributions.
+\item Take two random samples of the target data with replacement with for sample sizes $10\ldots 1010$ by 10.
+\item Calculate p-value and store
+\item Repeat steps 1 and 2 {\it B} times.  In this case 200 bootstrap samples were taken for each sample and 200 p-values were calculated.
 \end{enumerate}
 
-To prove the method, Figure~\ref{prob_1_rnorm} shows type 1 error rate for the two-sample t-test and WMW test in sample sizes ranging from 10 to 1000 with 500 bootstrap samples and tests performed at each sample size.  Figure\\
+To prove the method, Figure~\ref{type1error} shows type 1 error rate for two random samples from a normal distribution with mean $=$ 4 and standard deviations of 1 and 3, respectively for sample a and sample b bootstraps.  The error rates for the t-test procedure assuming equal variances is exactly the same as that not assuming equal variances.  These error rates are centered around 0.05 as expected.  However, interestingly, these error rates do not appear to be exact nor depend on sample size.  The WMW test maintains an almost universally higher Type 1 error rate compared to the two t-tests except in samples of less than 30.\\
 
-% There are these cases:
-% 1. normal unequal variances {power, type 1}: t.test, t.test unequal, wmw
-% 2. actual data {power, type 1}: t.test, t.test unequal, wmw
-%
-%
-%
-%
-%
-%
+Power can also be assessed by boostrapping.  The bootstrapping procedure was modified to select two random samples: one from a normal distribution with mean of 4 and standard deviation of 1, and a second sample from a normal distribution with mean 4.4 (10\% higher) and a standard deviation of 3.  Figure~\ref{prob_1_power} shows the share of bootstrapped samples for which the null hypothesis of no difference was rejected for each test by sample size.  Power is low for all tests starting with a sample size of 10.  As the selected sample sizes grow, power increases for all three tests with both variations of the t-test showing identical power.  As sample sizes grow larger than 100, t-tests noticably out perform the WMW test.  Interestingly, power between the t-tests and the WMW test appears to converge around sample size 900.\\
 
+Finally, both bootstrapping analyses are performed on the actual token earning data from the company.  Since this data is not normally distributed, it violates a necessary condition for using t-tests in small samples.  Figure~\ref{raw_data_type_1} shows type 1 error rates for each test applied to 200 bootstrap samples at each sample size.  Both t-tests exhibit lower type 1 error rates in samples smaller than about 300 observations compared to the WMW test.  However as sample size increases the WMW test exhibits lower type 1 error rates compared to the two t-tests.  Also, the t-test respecting unequal variances under performs that assuming equal variances in samples of less than about 110 observations.\\
 
-The results in Figure~\ref{prob_1_data} in Appendix A show that the mean differences are indeed normally distributed.  The histogram of mean differences appears to visually approximate a normal distribution.  Increasing the number of bootstrap samples taken causes the histogram to converge to normal with no recognizable difference.  Therefore, the assumption of normality is met in this case of two-sample t-test.\\
+Power calculations were also performed for all three test variations on the company's data.  Token data was randomly selected for each sample group.  One sample group was left as-is while the other was multiplied by 1.1 to increase the mean 10\%.  This level of increase is motivated by a meaningful difference in token earning as suggested by company representatives.  The WMW test vastly outperformed the two-sample t-tests.  The two variations of t-test performed identically.  By sample size of about 250 observations, the WMW test rejects the null hypothesis in 100\% of the bootstrap samples.  However, both t-tests have only rejected the null hypothesis about 15\% of the time.
 
-Many statistical tools such as analysis of variance and linear regression require assumptions of normality.  If these assumptions are not met these tools are not valid and may be biased without further transformation of data or adjustments to standard errors.  Bootstrapping is a simple way, often overlooked, to check distributional assumptions.  The general procedure is simple:\\
-
-\begin{enumerate}
-\item Randomly sample data of interest with replacement B times (generally 1,000 samples is enough).
-\item Calculate and save the statistic of interest for each sample.
-\item Look at the histogram of that statistic.  If it's normally distributed, calculate the standard deviation of the statistic across all samples to obtain the standard error of the statistic.
-\end{enumerate}
-
-Another assumption requred for the two-sample t-test to be valid is that the standard deviation of the differences is $\chi^{2}$ distributed with posi
-
-One simple tool for power calculations is the~\href{http://cran.r-project.org/web/packages/pwr/index.html}{pwr} package found in the R language.
+% 
+% The results in Figure~\ref{prob_1_data} in Appendix A show that the mean differences are indeed normally distributed.  The histogram of mean differences appears to visually approximate a normal distribution.  Increasing the number of bootstrap samples taken causes the histogram to converge to normal with no recognizable difference.  Therefore, the assumption of normality is met in this case of two-sample t-test.\\
+% 
+% Many statistical tools such as analysis of variance and linear regression require assumptions of normality.  If these assumptions are not met these tools are not valid and may be biased without further transformation of data or adjustments to standard errors.  Bootstrapping is a simple way, often overlooked, to check distributional assumptions.  The general procedure is simple:\\
+% 
+% \begin{enumerate}
+% \item Randomly sample data of interest with replacement B times (generally 1,000 samples is enough).
+% \item Calculate and save the statistic of interest for each sample.
+% \item Look at the histogram of that statistic.  If it's normally distributed, calculate the standard deviation of the statistic across all samples to obtain the standard error of the statistic.
+% \end{enumerate}
+% 
+% Another assumption requred for the two-sample t-test to be valid is that the standard deviation of the differences is $\chi^{2}$ distributed with posi
+% 
+% One simple tool for power calculations is the~\href{http://cran.r-project.org/web/packages/pwr/index.html}{pwr} package found in the R language.
 
 
 
@@ -239,7 +234,7 @@ One simple tool for power calculations is the~\href{http://cran.r-project.org/we
 \section{Appendix A}
 
 \begin{figure}[h!]
-<<fig_1, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', cache=TRUE>>=
+<<fig_1, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='3in', out.height='3in', cache=TRUE>>=
 library(ggplot2)
 library(reshape2)
 library(tikzDevice)
@@ -262,7 +257,7 @@ ggplot(raw.samples, aes(x = value)) +
 \end{figure}
 
 \begin{figure}[h!]
-<<type1error, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', warning=FALSE, cache=TRUE>>=
+<<type1error, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', out.height='3in', warning=FALSE, cache=TRUE>>=
 library(ggplot2)
 library(reshape2)
 library(tikzDevice)
@@ -275,7 +270,7 @@ t_p_vals_pwr <- rep(NA, B)
 t_unequal_p_vals_pwr <- rep(NA, B)
 wmw_p_vals_pwr <- rep(NA, B)
 
-begin <- 10; end <- 200; move_by <- 10
+begin <- 10; end <- 1010; move_by <- 100
 t_type_1 <- rep(NA, length(seq(begin, end, move_by)))
 t_unequal_type_1 <- rep(NA, length(seq(begin, end, move_by)))
 wmw_type_1 <- rep(NA, length(seq(begin, end, move_by)))
@@ -319,12 +314,12 @@ ggplot(output, aes(x = sample.size, y = value, colour = variable)) +
   geom_point()
 @
 \caption{test caption}
-\label{prob_1_rnorm_type1}
+\label{type1error}
 \end{figure}
 
 
 \begin{figure}[h!]
-<<power, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', warning=FALSE, cache=TRUE>>=
+<<power, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', out.height='3in', warning=FALSE, cache=TRUE>>=
 library(ggplot2)
 library(reshape2)
 library(tikzDevice)
@@ -337,7 +332,7 @@ t_p_vals_pwr <- rep(NA, B)
 t_unequal_p_vals_pwr <- rep(NA, B)
 wmw_p_vals_pwr <- rep(NA, B)
 
-begin <- 10; end <- 200; move_by <- 10
+begin <- 10; end <- 1010; move_by <- 100
 t_type_1 <- rep(NA, length(seq(begin, end, move_by)))
 t_unequal_type_1 <- rep(NA, length(seq(begin, end, move_by)))
 wmw_type_1 <- rep(NA, length(seq(begin, end, move_by)))
@@ -384,9 +379,8 @@ ggplot(output, aes(x = sample.size, y = value, colour = variable)) +
 \label{prob_1_power}
 \end{figure}
 
-\newpage
 \begin{figure}[h!]
-<<fig_3, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', warning=FALSE, cache=TRUE>>=
+<<raw_data_type_1, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', out.height='3in', warning=FALSE, cache=TRUE>>=
 library(ggplot2)
 library(reshape2)
 library(tikzDevice)
@@ -395,11 +389,19 @@ data <- read.csv("C:/R_stuff/school/article/data.csv")
 
 B <- 200
 t_p_vals <- rep(NA, B)
+t_unequal_p_vals <- rep(NA, B)
 wmw_p_vals <- rep(NA, B)
+t_p_vals_pwr <- rep(NA, B)
+t_unequal_p_vals_pwr <- rep(NA, B)
+wmw_p_vals_pwr <- rep(NA, B)
 
-begin <- 10; end <- 200; move_by <- 10
+begin <- 10; end <- 1010; move_by <- 100
 t_type_1 <- rep(NA, length(seq(begin, end, move_by)))
+t_unequal_type_1 <- rep(NA, length(seq(begin, end, move_by)))
 wmw_type_1 <- rep(NA, length(seq(begin, end, move_by)))
+t_pwr <- rep(NA, length(seq(begin, end, move_by)))
+t_unequal_pwr <- rep(NA, length(seq(begin, end, move_by)))
+wmw_pwr <- rep(NA, length(seq(begin, end, move_by)))
 
 for(j in seq(begin, end, move_by)){
   sample.size <- j 
@@ -409,13 +411,19 @@ for(i in 1:B){
   sample_b <- sample(table(data$user_id), sample.size, replace = TRUE)
 
   t_p_vals[i] <- t.test(sample_a, sample_b, alternative = "two.sided", var.equal = TRUE, conf.level = 0.95)$p.value
+  t_unequal_p_vals[i] <- t.test(sample_a, sample_b, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)$p.value
   wmw_p_vals[i] <- wilcox.test(sample_a, sample_b, alternative = "two.sided", conf.level = 0.95)$p.value
+  
+  t_p_vals_pwr[i] <- t.test(sample_c, sample_d, alternative = "two.sided", var.equal = TRUE, conf.level = 0.95)$p.value
+  t_unequal_p_vals_pwr[i] <- t.test(sample_c, sample_d, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)$p.value
+  wmw_p_vals_pwr[i] <- wilcox.test(sample_c, sample_d, alternative = "two.sided", conf.level = 0.95)$p.value
   }
 t_type_1[j/move_by] <- ifelse(is.na(table(t_p_vals <= 0.05)[2]), 0, table(t_p_vals <= 0.05)[2]) / B
+t_unequal_type_1[j/move_by] <- ifelse(is.na(table(t_unequal_p_vals <= 0.05)[2]), 0, table(t_unequal_p_vals <= 0.05)[2]) / B
 wmw_type_1[j/move_by] <- ifelse(is.na(table(wmw_p_vals <= 0.05)[2]), 0, table(wmw_p_vals <= 0.05)[2]) / B
 }
 
-output <- as.data.frame(list(t_test = t_type_1, wmw_test = wmw_type_1))
+output <- as.data.frame(list(t_test = t_type_1, t_test_unequal = t_unequal_type_1, wmw_test = wmw_type_1))
 output <- melt(output)
 output$sample.size <- seq(begin, end, move_by)
 
@@ -424,7 +432,59 @@ ggplot(output, aes(x = sample.size, y = value, colour = variable)) +
   geom_point()
 @
 \caption{test caption}
-\label{prob_1_data}
+\label{raw_data_type_1}
+\end{figure}
+
+\begin{figure}[h!]
+<<raw_data_power, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', out.height='3in', warning=FALSE, cache=TRUE>>=
+library(ggplot2)
+library(reshape2)
+library(tikzDevice)
+
+data <- read.csv("C:/R_stuff/school/article/data.csv")
+
+B <- 200
+t_p_vals <- rep(NA, B)
+t_unequal_p_vals <- rep(NA, B)
+wmw_p_vals <- rep(NA, B)
+t_p_vals_pwr <- rep(NA, B)
+t_unequal_p_vals_pwr <- rep(NA, B)
+wmw_p_vals_pwr <- rep(NA, B)
+
+begin <- 10; end <- 1010; move_by <- 100
+t_type_1 <- rep(NA, length(seq(begin, end, move_by)))
+t_unequal_type_1 <- rep(NA, length(seq(begin, end, move_by)))
+wmw_type_1 <- rep(NA, length(seq(begin, end, move_by)))
+t_pwr <- rep(NA, length(seq(begin, end, move_by)))
+t_unequal_pwr <- rep(NA, length(seq(begin, end, move_by)))
+wmw_pwr <- rep(NA, length(seq(begin, end, move_by)))
+
+for(j in seq(begin, end, move_by)){
+  sample.size <- j 
+for(i in 1:B){
+  
+  sample_c <- sample(table(data$user_id), sample.size, replace = TRUE)
+  sample_d <- sample(table(data$user_id), sample.size, replace = TRUE) * 1.1
+  
+  t_p_vals_pwr[i] <- t.test(sample_c, sample_d, alternative = "two.sided", var.equal = TRUE, conf.level = 0.95)$p.value
+  t_unequal_p_vals_pwr[i] <- t.test(sample_c, sample_d, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)$p.value
+  wmw_p_vals_pwr[i] <- wilcox.test(sample_c, sample_d, alternative = "two.sided", conf.level = 0.95)$p.value
+  }
+t_pwr[j/move_by] <- ifelse(is.na(table(t_p_vals_pwr <= 0.05)[2]), B, table(t_p_vals_pwr <= 0.05)[2]) / B
+t_unequal_pwr[j/move_by] <- ifelse(is.na(table(t_unequal_p_vals_pwr <= 0.05)[2]), B, table(t_unequal_p_vals_pwr <= 0.05)[2]) / B
+wmw_pwr[j/move_by] <- ifelse(is.na(table(wmw_p_vals_pwr <= 0.05)[2]), B, table(wmw_p_vals_pwr <= 0.05)[2]) / B
+}
+
+output <- as.data.frame(list(t_test_pwr = t_pwr, t_test_unequal_pwr = t_unequal_pwr, wmw_test_pwr = wmw_pwr))
+output <- melt(output)
+output$sample.size <- seq(begin, end, move_by)
+
+ggplot(output, aes(x = sample.size, y = value, colour = variable)) +
+  geom_smooth() +
+  geom_point()
+@
+\caption{test caption}
+\label{raw_data_power}
 \end{figure}
 
 
