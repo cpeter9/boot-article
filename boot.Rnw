@@ -102,6 +102,8 @@ $#1{AB}^\sigma$ $#1{H}^C$ $#1{\sin z}$ $#1{W}_n$}
 \renewcommand\thesection{\arabic{section}}
 \titleformat{\section}[block]{\large\scshape\centering}{\thesection.}{1em}{} % Change the look of the section titles
 \titleformat{\subsection}[block]{\large}{\thesubsection.}{1em}{} % Change the look of the section titles
+\titleformat{\subsubsection}[block]{}{\thesubsubsection.}{1em}{} % Change the look of the section titles
+
 
 \usepackage{fancyhdr} % Headers and footers
 \pagestyle{fancy} % All pages have headers and footers
@@ -232,6 +234,9 @@ This paper evaluates four major statistical tests for normality.  The tests incl
 
 \subsection{Tests for Normality}
 
+The literature claims that as of 1998 at least 40 different published tests for normality existed~\citep{dufour2008simulation}.  Though estimates seem rather inprecise, there is no doubt in the young statistical practictioner's mind that choosing the correct test for normality can seem daunting.  The mechanics of each test vary significantly and use of each test is usually left to ``rules of thumb'' when passed from the High Priests of statistics to newcomers.  A theme in the choice of test for normality generally seems to be that which was a given statistician's advisor's favorite test.  Rules of thumb generally say, avoid using tests for normality in small samples, but how small?  The proverb that normality tests can miss large departures from normality is common.  In order to assess these questions, deconstruction of each of four tests is followed by monte carlo simulation and bootstrapping across sample sizes.  Rejection rates and Type 1 errors are of a special consideration.
+
+\subsubsection{Shapiro-Wilk}
 
 \section{Bootstrapping for cross-validation}
 
