@@ -5,8 +5,11 @@
 # install.packages("nortest")
 library(nortest)
 
-install.packages("boot")
+# install.packages("boot")
 library(boot)
+
+# install.packages("tseries")
+library(tseries)
 
 # Suppose
 
@@ -32,11 +35,31 @@ shapiro.test(normal)
 shapiro.test(normal)
 ks.test(normal, "pnorm", alternative = "two.sided")
 ad.test(normal)
+jarque.bera.test(normal)
 
-sw_test <- function(data, indices) return(shapiro.test(data[indices])$p.value)
+sw_test <- function(data, indices, n){
+  d <- data[indices[1:n]]
+  return(shapiro.test(d[indices])$p.value)
+} 
 
-norm.ps <- boot(data = normal, statistic = sw_test, R = 100)$t
-gamma.ps <- boot(data = gamma, statistic = sw_test, R = 100)$t
+ad_test <- function(data, indices, n){
+  d <- data[indices[1:n]]
+  return(ad.test(d[indices])$p.value)
+} 
+
+ks_test <- function(data, indices, n){
+  d <- data[indices[1:n]]
+  return(ks.test(d[indices], "prnom", alternative = "two.sided")$p.value)
+} 
+
+jb_test <- function(data, indices, n){
+  d <- data[indices[1:n]]
+  return(ks.test(d[indices], "prnom", alternative = "two.sided")$p.value)
+}
+
+
+norm.ps <- boot(data = normal, statistic = sw_test, R = 100, n = sample.size)$t
+gamma.ps <- boot(data = gamma, statistic = sw_test, R = 100, n = sample.size)$t
 
 
 
