@@ -99,8 +99,9 @@ $#1{AB}^\sigma$ $#1{H}^C$ $#1{\sin z}$ $#1{W}_n$}
 % \renewcommand{\abstracttextfont}{\normalfont\small\itshape} % Set the abstract itself to small italic text
 
 \usepackage{titlesec} % Allows customization of titles
-\renewcommand\thesection{\Roman{section}}
+\renewcommand\thesection{\arabic{section}}
 \titleformat{\section}[block]{\large\scshape\centering}{\thesection.}{1em}{} % Change the look of the section titles
+\titleformat{\subsection}[block]{\large}{\thesubsection.}{1em}{} % Change the look of the section titles
 
 \usepackage{fancyhdr} % Headers and footers
 \pagestyle{fancy} % All pages have headers and footers
@@ -167,8 +168,6 @@ The following example takes a look at how power calculations can be carried out 
 A major assumption underlying the two-sample t-test is that the two samples from come from normally distributed populations.  When this assumption is violated, distribution-free tests such as the Wilcoxon-Mann-Whitney (WMW or Mann-Witney U) test are commonly 
 used \citep{skovlund01}. It is well known that the two-sample t-test is robust to departures from normality when data are large, but how large?\\
 
- 
-
 Suppose that we collect data on token earning prior to our experiment.  In this case the data from two randomly selected groups looks as is shown in Figure~\ref{fig:prob_1_raw_data} in Appendix A.  The data are clearly right skewed and look F, Chi-square, or exponentially distributed. While the t-test is usually robust to departures from normality in large samples, it is costly for the company to run large experiments.  Using bootstrapping, we can resample data from the same data stream that will record the effect of the experiment.  This will allow us to take thousands of samples for varying samples sizes in order to compare power and Type I error rates between the two methods.  The two-sample t-test with pooled variances and with separate variances is also analyzed.  By bootstrapping we are granted a look at the robustness of the two-sample t-test for this data with respect to sample size and when it should be preferred to the WMW test.\\
 
 The standard two-sample t-test is shown below:
@@ -223,7 +222,16 @@ Power calculations were also performed for all three test variations on the comp
 
 
 
-\section{Inference in the presence of heteroskedasticity}
+\section{Using bootstrapping to test for normality in small samples}
+
+Normality is a common assumption across many statistical procedures such as Analysis of Variance (ANOVA), linear regression, t-tests and z-tests.  When normality assumptions are violated, statistics that make up the aformentioned methods are not valid and may leader to incorrect inference.  There are two main ways that normality is commonly assessed: graphical methods, including histograms plotted against densitites and Q-Q plots.  The second method invovles the use of one of a number of statistical tests for normality.\\
+
+Small sample sizes typically pose problems for statistical tests of normality.  The major challenge is that such tests have lowre power in small samples and also that small samples may exhibit properities that fool tests for normlaity.  Type 1 error rates, that is rejecting the null hypothesis that the sample data were collected from a population with a normal distribution, may become unstable in small sample sizes.\\
+
+This paper evaluates four major statistical tests for normality.  The tests include the Shapiro-Wilk test, Kolmogorov-Smirnov test, the Anderson-Darling test and Jarque-Bera test.  The analysis relies on monte carlo simulation as well as bootstrapping across sample sizes.
+
+\subsection{Tests for Normality}
+
 
 \section{Bootstrapping for cross-validation}
 
