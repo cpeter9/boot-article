@@ -40,24 +40,20 @@ ks.test(normal, "pnorm", alternative = "two.sided")
 ad.test(normal)
 jarque.bera.test(normal)
 
-sw_test <- function(data, indices, n){
-  d <- data[indices[1:n]]
-  return(shapiro.test(d[indices])$p.value)
+sw_test <- function(data, indices){
+  return(shapiro.test(data[indices])$p.value)
 } 
 
-ad_test <- function(data, indices, n){
-  d <- data[indices[1:n]]
-  return(ad.test(d[indices])$p.value)
+ad_test <- function(data, indices){
+  return(ad.test(data[indices])$p.value)
 } 
 
-ks_test <- function(data, indices, n){
-  d <- data[indices[1:n]]
-  return(ks.test(d[indices], "pnorm", alternative = "two.sided")$p.value)
+ks_test <- function(data, indices){
+  return(ks.test(data[indices], "pnorm", alternative = "two.sided")$p.value)
 } 
 
-jb_test <- function(data, indices, n){
-  d <- data[indices[1:n]]
-  return(jarque.bera.test(d[indices])$p.value)
+jb_test <- function(data, indices){
+  return(jarque.bera.test(data[indices])$p.value)
 }
 
 
@@ -68,9 +64,11 @@ boot(data = normal, statistic = jb_test, R = 100, n = sample.size)
 
 # Loop over small sample sizes
 smallest.size <- 10
-largest.size <- 200
-size.by <- 5
+largest.size <- 1000
+size.by <- 10
+boot.size <- 100
 for(i in seq(smallest.size, largest.size, by = size.by)){
+  set.seed(i)
   sample.size <- i
   
   # Various normal distributions
@@ -84,12 +82,12 @@ for(i in seq(smallest.size, largest.size, by = size.by)){
   gamma <- rgamma(sample.size, shape = 2, rate = 2)
   
   # SW test
-  norm.sw <- boot(data = normal, statistic = sw_test, R = 100, n = sample.size)$t
-  norm.wide.sw <- boot(data = normal_wide, statistic = sw_test, R = 100, n = sample.size)$t
-  norm.skinny.sw <- boot(data = normal_skinny, statistic = sw_test, R = 100, n = sample.size)$t
-  uniform.sw <- boot(data = uniform, statistic = sw_test, R = 100, n = sample.size)$t
-  chisq.sw <- boot(data = chisq, statistic = sw_test, R = 100, n = sample.size)$t
-  gamma.sw <- boot(data = gamma, statistic = sw_test, R = 100, n = sample.size)$t
+  norm.sw <- boot(data = normal, statistic = sw_test, R = boot.size)$t
+  norm.wide.sw <- boot(data = normal_wide, statistic = sw_test, R = boot.size)$t
+  norm.skinny.sw <- boot(data = normal_skinny, statistic = sw_test, R = boot.size)$t
+  uniform.sw <- boot(data = uniform, statistic = sw_test, R = boot.size)$t
+  chisq.sw <- boot(data = chisq, statistic = sw_test, R = boot.size)$t
+  gamma.sw <- boot(data = gamma, statistic = sw_test, R = boot.size)$t
   
   if(sample.size == smallest.size) {
     temp <- as.data.frame(list(sample.size = sample.size,
@@ -111,8 +109,18 @@ output <- melt(temp, "sample.size")
 
 ggplot(output, aes(x = sample.size, y = value, colour = variable)) +
   geom_smooth() +
-  geom_point() +
   geom_hline(yintercept = 0.05, colour = "red")
+
+
+aggregate(output$value > 0.05, list(output$variable), table)
+
+B <- 100
+p_vals <- rep(NA, B)
+for(i in 1:B){
+  normal <- rnorm(150, mean = 0, sd = 1)
+  p_vals[i] <- shapiro.test(normal)$p.value
+}
+
 
 output <- aggregate(output$value, list(output$variable, output$sample.size), mean)
   names(output) <- c("dist.test", "sample.size", "value")
