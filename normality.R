@@ -88,12 +88,12 @@ for(i in seq(smallest.size, largest.size, by = size.by)){
   p_fill$gamma.sw[j] <- shapiro.test(gamma)$p.value
   
   # KS test
-  p_fill$norm.ks[j] <- ks.test(normal, "pnorm", alternative = "two.sided")$p.value
-  p_fill$norm.wide.ks[j] <- ks.test(normal_wide, "pnorm", alternative = "two.sided")$p.value
-  p_fill$norm.skinny.ks[j] <- ks.test(normal_skinny, "pnorm", alternative = "two.sided")$p.value
-  p_fill$uniform.ks[j] <- ks.test(uniform, "pnorm", alternative = "two.sided")$p.value
-  p_fill$chisq.ks[j] <- ks.test(chisq, "pnorm", alternative = "two.sided")$p.value
-  p_fill$gamma.ks[j] <- ks.test(gamma, "pnorm", alternative = "two.sided")$p.value
+  p_fill$norm.ks[j] <- ks.test(normal, "pnorm", alternative = "two.sided", mean = mean(normal), sd = sd(normal))$p.value
+  p_fill$norm.wide.ks[j] <- ks.test(normal_wide, "pnorm", alternative = "two.sided", mean = mean(normal_wide), sd = sd(normal_wide))$p.value
+  p_fill$norm.skinny.ks[j] <- ks.test(normal_skinny, "pnorm", alternative = "two.sided", mean = mean(normal_skinny), sd = sd(normal_skinny))$p.value
+  p_fill$uniform.ks[j] <- ks.test(uniform, "pnorm", alternative = "two.sided", mean = mean(uniform), sd = sd(uniform))$p.value
+  p_fill$chisq.ks[j] <- ks.test(chisq, "pnorm", alternative = "two.sided", mean = mean(chisq), sd = sd(chisq))$p.value
+  p_fill$gamma.ks[j] <- ks.test(gamma, "pnorm", alternative = "two.sided", mean = mean(gamma), sd = sd(gamma))$p.value
   
   # AD test
   p_fill$norm.ad[j] <- ad.test(normal)$p.value
@@ -131,9 +131,12 @@ substrLeft <- function(x, n){
 }
 
 output$test <- substrRight(output$variable, 2)
-output$test <- substrRight(output$variable, 2)
+output$dist <- substrLeft(output$variable, 3)
 
-
+ggplot(output, aes(x = sample.size, y = value)) +
+  geom_smooth() +
+  facet_grid(dist ~ test) +
+  ylab("")
 
 ggplot(output, aes(x = sample.size, y = value, colour = variable)) +
   geom_smooth() +
