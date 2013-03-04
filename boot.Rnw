@@ -151,6 +151,7 @@ theme_set(theme_grey(base_size = 9))
 %  ABSTRACT
 %----------------------------------------------------------------------------------------
 
+\newpage
 \begin{abstract}
 
 \noindent Much of what young statisticians in training learn in undergraduate and graduate school relies on large-sample asymptotic theory.  Well known statistics are calculated and with a few assumptions a standard error is developed to measure inference reliability.  Unfortunately data are not always sufficiently large such that finite sample properties match those required by large-sample asymptotics.  Additionally a careful examination of assumptions is always required for successful inference.  In some cases common checks of assumptions may not be possible with a high degree of power, especially in cases of  small samples.  One common solution to this problem involves resampling data with replacement to empirically calculate the variance of any statistic.  This solution is generally referred to as bootstrapping.  In addition to its uses for inference, variations on boostrapping methods can be used to simulate data for cross-validation or other purposes.  This article will focus on three applications of boostrapping.  The first is verification of power calculations for a simple experiment.  The second involves inference in the presence of heteroskedasticity.  The third focuses on bootstrapping for cross-validation.
@@ -163,14 +164,14 @@ theme_set(theme_grey(base_size = 9))
 
 \section{Verification of power calculations}
 
-Power calculations are generally considered good pre-requisite for any designed experiment.  Such calculations allow researchers to determine reasonable sample size requirements before carrying out an experiment.  Such calculations can help researchers avoid carrying out experiments doomed in the sense of statistical detection before experimentation begins.\\ 
+Power calculations are generally considered good pre-requisite for any designed experiment.  Such calculations allow researchers to determine reasonable sample size requirements before carrying out an experiment.  Such calculations can help researchers avoid carrying out experiments doomed in the sense of statistical detection before experimentation begins.
 
-The following example takes a look at how power calculations can be carried out and verified by bootstrapping sample data.  In this case a web app company wants to perform an experiment on a business practice.  The company has found a relationship between earning tokens on the site and customer longevity and financial value.  The company decides that it would like to encourage its customers to earn more tokens by sending an email.  However, the company would also like to compare the effect of the email against a control group of customers that did not receive the email.  A two-sample t-test is selected to test for a difference between the mean number of tokens earned in the experiment group and control group.\\
+The following example takes a look at how power calculations can be carried out and verified by bootstrapping sample data.  In this case a web app company wants to perform an experiment on a business practice.  The company has found a relationship between earning tokens on the site and customer longevity and financial value.  The company decides that it would like to encourage its customers to earn more tokens by sending an email.  However, the company would also like to compare the effect of the email against a control group of customers that did not receive the email.  A two-sample t-test is selected to test for a difference between the mean number of tokens earned in the experiment group and control group.
 
 A major assumption underlying the two-sample t-test is that the two samples from come from normally distributed populations.  When this assumption is violated, distribution-free tests such as the Wilcoxon-Mann-Whitney (WMW or Mann-Witney U) test are commonly 
-used \citep{skovlund01}. It is well known that the two-sample t-test is robust to departures from normality when data are large, but how large?\\
+used \citep{skovlund01}. It is well known that the two-sample t-test is robust to departures from normality when data are large, but how large?
 
-Suppose that we collect data on token earning prior to our experiment.  In this case the data from two randomly selected groups looks as is shown in Figure~\ref{fig:prob_1_raw_data} in Appendix A.  The data are clearly right skewed and look F, Chi-square, or exponentially distributed. While the t-test is usually robust to departures from normality in large samples, it is costly for the company to run large experiments.  Using bootstrapping, we can resample data from the same data stream that will record the effect of the experiment.  This will allow us to take thousands of samples for varying samples sizes in order to compare power and Type I error rates between the two methods.  The two-sample t-test with pooled variances and with separate variances is also analyzed.  By bootstrapping we are granted a look at the robustness of the two-sample t-test for this data with respect to sample size and when it should be preferred to the WMW test.\\
+Suppose that we collect data on token earning prior to our experiment.  In this case the data from two randomly selected groups looks as is shown in Figure~\ref{fig:prob_1_raw_data} in Appendix A.  The data are clearly right skewed and look F, Chi-square, or exponentially distributed. While the t-test is usually robust to departures from normality in large samples, it is costly for the company to run large experiments.  Using bootstrapping, we can resample data from the same data stream that will record the effect of the experiment.  This will allow us to take thousands of samples for varying samples sizes in order to compare power and Type I error rates between the two methods.  The two-sample t-test with pooled variances and with separate variances is also analyzed.  By bootstrapping we are granted a look at the robustness of the two-sample t-test for this data with respect to sample size and when it should be preferred to the WMW test.
 
 The standard two-sample t-test is shown below:
 
@@ -199,11 +200,11 @@ In order to assess power and type 1 error rates by sample size:
 \item Repeat steps 1 and 2 {\it B} times.  In this case 200 bootstrap samples were taken for each sample and 200 p-values were calculated.
 \end{enumerate}
 
-To prove the method, Figure~\ref{type1error} shows type 1 error rate for two random samples from a normal distribution with mean $=$ 4 and standard deviations of 1 and 3, respectively for sample a and sample b bootstraps.  The error rates for the t-test procedure assuming equal variances is exactly the same as that not assuming equal variances.  These error rates are centered around 0.05 as expected.  However, interestingly, these error rates do not appear to be exact nor depend on sample size.  The WMW test maintains an almost universally higher Type 1 error rate compared to the two t-tests except in samples of less than 30.\\
+To prove the method, Figure~\ref{type1error} shows type 1 error rate for two random samples from a normal distribution with mean $=$ 4 and standard deviations of 1 and 3, respectively for sample a and sample b bootstraps.  The error rates for the t-test procedure assuming equal variances is exactly the same as that not assuming equal variances.  These error rates are centered around 0.05 as expected.  However, interestingly, these error rates do not appear to be exact nor depend on sample size.  The WMW test maintains an almost universally higher Type 1 error rate compared to the two t-tests except in samples of less than 30.
 
-Power can also be assessed by boostrapping.  The bootstrapping procedure was modified to select two random samples: one from a normal distribution with mean of 4 and standard deviation of 1, and a second sample from a normal distribution with mean 4.4 (10\% higher) and a standard deviation of 3.  Figure~\ref{prob_1_power} shows the share of bootstrapped samples for which the null hypothesis of no difference was rejected for each test by sample size.  Power is low for all tests starting with a sample size of 10.  As the selected sample sizes grow, power increases for all three tests with both variations of the t-test showing identical power.  As sample sizes grow larger than 100, t-tests noticably out perform the WMW test.  Interestingly, power between the t-tests and the WMW test appears to converge around sample size 900.\\
+Power can also be assessed by boostrapping.  The bootstrapping procedure was modified to select two random samples: one from a normal distribution with mean of 4 and standard deviation of 1, and a second sample from a normal distribution with mean 4.4 (10\% higher) and a standard deviation of 3.  Figure~\ref{prob_1_power} shows the share of bootstrapped samples for which the null hypothesis of no difference was rejected for each test by sample size.  Power is low for all tests starting with a sample size of 10.  As the selected sample sizes grow, power increases for all three tests with both variations of the t-test showing identical power.  As sample sizes grow larger than 100, t-tests noticably out perform the WMW test.  Interestingly, power between the t-tests and the WMW test appears to converge around sample size 900 (observations).
 
-Finally, both bootstrapping analyses are performed on the actual token earning data from the company.  Since this data is not normally distributed, it violates a necessary condition for using t-tests in small samples.  Figure~\ref{raw_data_type_1} shows type 1 error rates for each test applied to 200 bootstrap samples at each sample size.  Both t-tests exhibit lower type 1 error rates in samples smaller than about 300 observations compared to the WMW test.  However as sample size increases the WMW test exhibits lower type 1 error rates compared to the two t-tests.  Also, the t-test respecting unequal variances under performs that assuming equal variances in samples of less than about 110 observations.\\
+Finally, both bootstrapping analyses are performed on the actual token earning data from the company.  Since this data is not normally distributed, it violates a necessary condition for using t-tests in small samples.  Figure~\ref{raw_data_type_1} shows type 1 error rates for each test applied to 200 bootstrap samples at each sample size.  Both t-tests exhibit lower type 1 error rates in samples smaller than about 300 observations compared to the WMW test.  However as sample size increases the WMW test exhibits lower type 1 error rates compared to the two t-tests.  Also, the t-test respecting unequal variances under performs that assuming equal variances in samples of less than about 110 observations.
 
 Power calculations were also performed for all three test variations on the company's data.  Token data was randomly selected for each sample group.  One sample group was left as-is while the other was multiplied by 1.1 to increase the mean 10\%.  This level of increase is motivated by a meaningful difference in token earning as suggested by company representatives.  The WMW test vastly outperformed the two-sample t-tests.  The two variations of t-test performed identically.  By sample size of about 250 observations, the WMW test rejects the null hypothesis in 100\% of the bootstrap samples.  However, both t-tests have only rejected the null hypothesis about 15\% of the time.
 
@@ -226,9 +227,9 @@ Power calculations were also performed for all three test variations on the comp
 
 \section{Using bootstrapping to test for normality in small samples}
 
-Normality is a common assumption across many statistical procedures such as Analysis of Variance (ANOVA), linear regression, t-tests and z-tests.  When normality assumptions are violated, statistics that make up the aformentioned methods are not valid and may leader to incorrect inference.  There are two main ways that normality is commonly assessed: graphical methods, including histograms plotted against densitites and Q-Q plots.  The second method invovles the use of one of a number of statistical tests for normality.\\
+Normality is a common assumption across many statistical procedures such as Analysis of Variance (ANOVA), linear regression, t-tests and z-tests.  When normality assumptions are violated, statistics that make up the aformentioned methods are not valid and may leader to incorrect inference.  There are two main ways that normality is commonly assessed: graphical methods, including histograms plotted against densitites and Q-Q plots.  The second method invovles the use of one of a number of statistical tests for normality.
 
-Small sample sizes typically pose problems for statistical tests of normality.  The major challenge is that such tests have lowre power in small samples and also that small samples may exhibit properities that fool tests for normlaity.  Type 1 error rates, that is rejecting the null hypothesis that the sample data were collected from a population with a normal distribution, may become unstable in small sample sizes.\\
+Small sample sizes typically pose problems for statistical tests of normality.  The major challenge is that such tests have lowre power in small samples and also that small samples may exhibit properities that fool tests for normlaity.  Type 1 error rates, that is rejecting the null hypothesis that the sample data were collected from a population with a normal distribution, may become unstable in small sample sizes.
 
 This paper evaluates four major statistical tests for normality.  The tests include the Shapiro-Wilk test, Kolmogorov-Smirnov test, the Anderson-Darling test and Jarque-Bera test.  The analysis relies on monte carlo simulation as well as bootstrapping across sample sizes.
 
@@ -266,11 +267,11 @@ where
 a' &= (a_1,\dots,a_m) = \frac{m'V^{-1}}{(m'V^{-1}V^{-1}m)^{1 / 2}}
 \end{align}
 
-The complete derivation involves introducing sample variance $S^2$ into a ratio that in essence compares that value to expected variance as scaled by sample data.  The test statistic {\it W} ranges between zero and one.  Values close to zero lead to rejection of the null hypothsis of normality and values closer to one fail to lead to such rejection.  Shapiro-Wilk was later modified by Royston who expanded the statistical procedures to be robust for samples ranging from three to 5,0000 in sample size.~\citep{royston1982extension}\\
+The complete derivation involves introducing sample variance $S^2$ into a ratio that in essence compares that value to expected variance as scaled by sample data.  The test statistic {\it W} ranges between zero and one.  Values close to zero lead to rejection of the null hypothsis of normality and values closer to one fail to lead to such rejection.  Shapiro-Wilk was later modified by Royston who expanded the statistical procedures to be robust for samples ranging from three to 5,0000 in sample size.~\citep{royston1982extension}
 
 \subsubsection{Kolmogorov-Smirnov Test}
 
-While the Shaprio-Wilk test comes from a class of tests called correlation tests, the Kolmogorov-Smirnov test (KS) from a class called goodness-of-fit tests based on empirical distribution functions (EDF tests).  These tests are so-called because they compare the empirical cumulative density function $F_n(x)$ against the theoretical CDF $F(x)$.  One drawback of such tests is that they are known to have weak power by where the tests require estimation of parameters from the test sample~\citep{1974}.\\
+While the Shaprio-Wilk test comes from a class of tests called correlation tests, the Kolmogorov-Smirnov test (KS) from a class called goodness-of-fit tests based on empirical distribution functions (EDF tests).  These tests are so-called because they compare the empirical cumulative density function $F_n(x)$ against the theoretical CDF $F(x)$.  One drawback of such tests is that they are known to have weak power by where the tests require estimation of parameters from the test sample~\citep{1974}.
 
 The Kolmogorov-Sirnov procedure is as follow:
 
@@ -288,7 +289,7 @@ T &= sup_x|F(x) - F_n(x)|
 
 \subsubsection{Anderson-Darling Test}
 
-The Anderson-Darling test (AD) is another EDF-type test.  The test is a variant of the popular Cramer-von Mises (CVM) test~\citep{farrell2006comprehensive}.  The AD test statistic is of the form $\int_{-\infty}^{\infty}[F_n(x) - \phi(x)]^2\psi(t)$d{\it t}, where $\psi(t)$ is a weight function of the Cramer-von Mises class.  The weight function is what specifically differentiates the AD test from the CVM test.  It is of the form $\psi = [(\phi(x))(1 - \phi(x))]^{-1}$.  This variate of weight function allows the AD test to place greater importance on differences at the tails of the sample distribution.  The AD test can be computed as:\\
+The Anderson-Darling test (AD) is another EDF-type test.  The test is a variant of the popular Cramer-von Mises (CVM) test~\citep{farrell2006comprehensive}.  The AD test statistic is of the form $\int_{-\infty}^{\infty}[F_n(x) - \phi(x)]^2\psi(t)$d{\it t}, where $\psi(t)$ is a weight function of the Cramer-von Mises class.  The weight function is what specifically differentiates the AD test from the CVM test.  It is of the form $\psi = [(\phi(x))(1 - \phi(x))]^{-1}$.  This variate of weight function allows the AD test to place greater importance on differences at the tails of the sample distribution.  The AD test can be computed as:
 
 \begin{align}
 \text{AD} &= \left(\frac{1}{n}\right)\sum_{i=1}^{n}(2i - 1)\text{log}[z_i + \text{log}(1 - z_{n+1-i})] - n
@@ -298,34 +299,40 @@ where $z_i = \phi(y_{(i)})$ with $y_{(i)} = (x_{(i)} - \widebar{x}) / s$.
 
 \subsubsection{Jarque-Bera}
 
-The Jarque-Bera test, formalized in 1987, is considered part of third type of statistics that test for departures from normality.  These tests are called Moment tests and focus on combinations of sample moments as compares to those of the theoretical normal distribution.  The Jarque-Bera test is given as follows:\\
+The Jarque-Bera test, formalized in 1987, is considered part of third type of statistics that test for departures from normality.  These tests are called Moment tests and focus on combinations of sample moments as compares to those of the theoretical normal distribution.  The Jarque-Bera test is given as follows:
 
 \begin{align}
 \text{JB} &= n \left(\frac{(\sqrt(b_1))^2}{6} + \frac{(b_2 - 3)^2}{24}\right)
 \end{align}
 
-The Jarque-Bera test is very simple to compute and measures sample kurtosis and skewness against theoretical kurtosis and skewness from a normal distribution.\\
+The Jarque-Bera test is very simple to compute and measures sample kurtosis and skewness against theoretical kurtosis and skewness from a normal distribution.
 
 \subsubsection{Monte Carlo simulation}
 
-Comparisons of the four test statistics for power and Type 1 error are made by way of Monte Carlo simulation bootstrapped by sample size.  Six hypothetical distributions of random variables were chosen for the analysis and appear in Figure~\ref{dists} in Appendix A.  The distributions include three normal distributions: one standard normal, one normal distribution $(\mu = 0,~ \sigma^2 = 1)$ with wide variance ($\mu = 0,~\sigma^2 = 3$), and one normal distribution with smaller than standard variance $(\mu = 0,~\sigma^2 = 0.25)$.  Three non-normal distributions are also examined: one uniform distribution $[0,~1]$, one $\chi^2$ distribution $(df = 3)$ and a gamma distribution $(\text{shape} = 2,~\text{scale} = 2)$.\\
+Comparisons of the four test statistics for power and Type 1 error are made by way of Monte Carlo simulation bootstrapped by sample size.  Six hypothetical distributions of random variables were chosen for the analysis and appear in Figure~\ref{dists} in Appendix A.  The distributions include three normal distributions: one standard normal, one normal distribution $(\mu = 0,~ \sigma^2 = 1)$ with wide variance ($\mu = 0,~\sigma^2 = 3$), and one normal distribution with smaller than standard variance $(\mu = 0,~\sigma^2 = 0.25)$.  Three non-normal distributions are also examined: one uniform distribution $[0,~1]$, one $\chi^2$ distribution $(df = 3)$ and a gamma distribution $(\text{shape} = 2,~\text{scale} = 2)$.
 
 Tests for normality setup and test the hypothesis test below:
 
 \begin{align}
-H_0&: \text{The sample comes from a normally distributed population}\\
+H_0&: \text{The sample comes from a normally distributed population}
 H_A&: \text{The sample comes from a population that is not normally distributed}
 \end{align}
 
-Unfortunately, many practitioners neglect the significance of normality assumed as the null hypothesis.  Tests of normality actually test for departures from normality.  Therefore normality is never ``proved'' or accepted as the null hypothesis is never accepted.  Contrary, the alternative hypothesis, only a departure from normality can be accepted statistically.  This confusion leads many young practioners to apply their favorite test, note that the probability value is less than 0.05 and continue on with Analysis of Variance or linear regression, etc.  Not only do many (especially young) practitioners reverse the hypotheses, but if they do setup the hypotheses correctly, the second error of claiming to have ``proved'' normality is common.\\
+Unfortunately, many practitioners neglect the significance of normality assumed as the null hypothesis.  Tests of normality actually test for departures from normality.  Therefore normality is never ``proved'' or accepted as the null hypothesis is never accepted.  Contrary, the alternative hypothesis, only a departure from normality can be accepted statistically.  This confusion leads many young practioners to apply their favorite test, note that the probability value is less than 0.05 and continue on with Analysis of Variance or linear regression, etc.  Not only do many (especially young) practitioners reverse the hypotheses, but if they do setup the hypotheses correctly, the second error of claiming to have ``proved'' normality is common.
 
-Type 1 error rates are special consideration in this analysis.  Type 1 error occurs when a practitioner rejects the null hypothesis when the hypothesis is indeed true.  In this case, that would mean that the underlying population distribution is normally distributed, but the practitioner is lead to reject the null hypothesis and accept the alternative hypothesis that the sample came from a population that was not normally distributed.\\
+Type 1 error rates are special consideration in this analysis.  Type 1 error occurs when a practitioner rejects the null hypothesis when the hypothesis is indeed true.  In this case, that would mean that the underlying population distribution is normally distributed, but the practitioner is lead to reject the null hypothesis and accept the alternative hypothesis that the sample came from a population that was not normally distributed.
 
-Monte Carlo simulation can be used to measure Type 1 error rates by drawing random numbers known to be normally distributed.  In this analysis 1,000 separate samples are collected for each distribution.  The sample sizes range from 10 to 1,000 in increments of 5.  In total 792,000 samples are taken with 401,980,000 simulated observations.  For Type 1 error rate analysis we focus on the numbers generated from known normal distributions.  As mentioned above, there are three such classes generated: standard normal, normal with wide variance, and normal with thin variance.  By looking at the share of cases where the null hypothesis is rejected by each test by each sample size, we can calculate Type 1 error rates.\\
+Monte Carlo simulation can be used to measure Type 1 error rates by drawing random numbers known to be normally distributed.  In this analysis 1,000 separate samples are collected for each distribution.  The sample sizes range from 10 to 1,000 in increments of 5.  In total 792,000 samples are taken with 401,980,000 simulated observations.  For Type 1 error rate analysis we focus on the numbers generated from known normal distributions.  As mentioned above, there are three such classes generated: standard normal, normal with wide variance, and normal with thin variance.  By looking at the share of cases where the null hypothesis is rejected by each test by each sample size, we can calculate Type 1 error rates.
 
-Figure~\ref{type1_monte_carlo} shows Type 1 error rates by test by sample size.  The Shapiro-Wilk, Kolmogrov-Smirnov, and Anderson-Darling tests all appear to have Type 1 error rates that are well controlled around 5\% (as specified).  The Jarque-Bera test's Type 1 error rates are surprisingly lower than 5\% in samples smaller than 50 observations.  The JB Type 1 error rates increase from 10 through about 75 observations at which point they flatten out around 4\%.  This is perhaps not as surprising as it may seem as the Jarque-Bera is a relatively simple test, seemingly constructed more for ease of use rather than precise error control.\\
+Figure~\ref{type1_monte_carlo} shows Type 1 error rates by test by sample size.  The Shapiro-Wilk, Kolmogrov-Smirnov, and Anderson-Darling tests all appear to have Type 1 error rates that are well controlled around 5\% (as specified).  The Jarque-Bera test's Type 1 error rates are surprisingly lower than 5\% in samples smaller than 50 observations.  The JB Type 1 error rates increase from 10 through about 75 observations at which point they flatten out around 4\%.  This is perhaps not as surprising as it may seem as the Jarque-Bera is a relatively simple test, seemingly constructed more for ease of use rather than precise error control.
 
+Statistical power is a second important concern when it comes to administering tests for departures from normality.  Power, also called the inverse of Type II error rate is the ability of a statistical test to reject the null hypothesis in the presence of a state that in which the null hypothesis should be rejected.  Statistical power is also refered as the ability of a test to detect that which is represented by the alternative hypothesis.  Figure~\ref{power_monte_carlo} shows statistical power for each statistical test by sample size.
 
+Statistical tests for departure from normality were assessed over three distributions: chi-square, gamma, and uniform.  The Shapiro-Wilk test appears to have the best power among the three tests for use on the chi-square and gamma distribution.  The Kolmolgrov-Smirnov test has nearly perfect power against the uniform distribution from sample size 10.  The Jaruq-Bera test presents results that are expected against the chi-square and gamma distributions, but has a strange binomial swing in power as applied to the uniform distribution.  In all three tests, the Shapiro-Wilk test appears to dominate the Anderson-Darling test.
+
+The Shapiro-Wilk test appears to be the majority winner among the three distributions that was applied against each test.  The test reaches nearly pefect power against the chi-square around 50 observations and around 75 against the gamma distribution.
+
+Interestingly, the Kolmogrov-Smirnov test appears to have very low power against the chi-square and gamma distributions as specified, but nearly perfect power against the uniform distribution.  The KS test is noted to have relativley low power in the literature.
 
 
 
@@ -748,6 +755,128 @@ ggplot(df[grep("norm", df$dist), ], aes(x = sample.size, y = power_type1, colour
 @
 \caption{test caption}
 \label{type1_monte_carlo}
+\end{figure}
+
+\begin{figure}[h!]
+<<power_test, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', out.height='3in', warning=FALSE, cache=TRUE>>=
+# Loop over small sample sizes
+library(ggplot2)
+library(reshape2)
+library(tikzDevice)
+library(nortest)
+library(tseries)
+
+
+smallest.size <- 10
+largest.size <- 100
+size.by <- 5
+boot.size <- 1000
+
+for(i in c(".sw", ".ks", ".ad", ".jb")){ # create fill vectors to put bootstapped p-values in
+  norm <- rep(NA, boot.size)
+  norm.wide <- rep(NA, boot.size)
+  norm.skinny <- rep(NA, boot.size)
+  uniform <- rep(NA, boot.size)
+  chisq <- rep(NA, boot.size)
+  gamma <- rep(NA, boot.size)
+  
+  if(i == ".sw") {p_fill <- as.data.frame(cbind(norm, norm.wide, norm.skinny, uniform, chisq, gamma))
+                 names(p_fill) <- paste(names(p_fill), i, sep = "")} else
+                 {temp <- as.data.frame(cbind(norm, norm.wide, norm.skinny, uniform, chisq, gamma))
+                  names(temp) <- paste(names(temp), i, sep = "")
+                  p_fill <- cbind(p_fill, temp)}
+}
+
+
+for(i in seq(smallest.size, largest.size, by = size.by)){
+  sample.size <- i
+  
+  for(j in 1:boot.size){
+  # Various normal distributions
+  normal <- rnorm(sample.size, mean = 0, sd = 1)
+  normal_wide <- rnorm(sample.size, mean = 0, sd = 3)
+  normal_skinny <- rnorm(sample.size, mean = 0, sd = 0.5)
+  
+  # Other distributions
+  uniform <- runif(sample.size, min = 0, max = 1)
+  chisq <- rchisq(sample.size, df = 3)
+  gamma <- rgamma(sample.size, shape = 2, rate = 2)
+  
+  # SW test
+  p_fill$norm.sw[j] <- shapiro.test(normal)$p.value
+  p_fill$norm.wide.sw[j] <- shapiro.test(normal_wide)$p.value
+  p_fill$norm.skinny.sw[j] <- shapiro.test(normal_skinny)$p.value
+  p_fill$uniform.sw[j] <- shapiro.test(uniform)$p.value
+  p_fill$chisq.sw[j] <- shapiro.test(chisq)$p.value
+  p_fill$gamma.sw[j] <- shapiro.test(gamma)$p.value
+  
+  # KS test
+  p_fill$norm.ks[j] <- ks.test(normal, "pnorm", alternative = "two.sided", mean = 0, sd = 1)$p.value
+  p_fill$norm.wide.ks[j] <- ks.test(normal_wide, "pnorm", alternative = "two.sided", mean = 0, sd = 3)$p.value
+  p_fill$norm.skinny.ks[j] <- ks.test(normal_skinny, "pnorm", alternative = "two.sided", mean = 0, sd = 0.5)$p.value
+  p_fill$uniform.ks[j] <- ks.test(uniform, "punif", alternative = "two.sided", min = 0, max = 0)$p.value
+  p_fill$chisq.ks[j] <- ks.test(chisq, "pchisq", alternative = "greater", df = 3)$p.value
+  p_fill$gamma.ks[j] <- ks.test(gamma, "pgamma", alternative = "greater", shape = 2, rate = 2)$p.value
+  
+  # AD test
+  p_fill$norm.ad[j] <- ad.test(normal)$p.value
+  p_fill$norm.wide.ad[j] <- ad.test(normal_wide)$p.value
+  p_fill$norm.skinny.ad[j] <- ad.test(normal_skinny)$p.value
+  p_fill$uniform.ad[j] <- ad.test(uniform)$p.value
+  p_fill$chisq.ad[j] <- ad.test(chisq)$p.value
+  p_fill$gamma.ad[j] <- ad.test(gamma)$p.value
+  
+  # JB test
+  p_fill$norm.jb[j] <- jarque.bera.test(normal)$p.value
+  p_fill$norm.wide.jb[j] <- jarque.bera.test(normal_wide)$p.value
+  p_fill$norm.skinny.jb[j] <- jarque.bera.test(normal_skinny)$p.value
+  p_fill$uniform.jb[j] <- jarque.bera.test(uniform)$p.value
+  p_fill$chisq.jb[j] <- jarque.bera.test(chisq)$p.value
+  p_fill$gamma.jb[j] <- jarque.bera.test(gamma)$p.value
+  }
+  
+  if(sample.size == smallest.size) {
+    temp <- as.data.frame(cbind(sample.size = sample.size,
+                                p_fill))} else {
+                                 temp <- rbind(temp, cbind(sample.size, p_fill))}
+}
+
+output <- melt(temp, "sample.size")
+output$variable <- as.character(output$variable)
+
+# seperate.tests
+substrRight <- function(x, n){
+  substr(x, nchar(x) - n + 1, nchar(x))
+}
+
+substrLeft <- function(x, n){
+  substr(x, 1, nchar(x) - n)
+}
+
+output$test <- substrRight(output$variable, 2)
+output$dist <- substrLeft(output$variable, 3)
+
+df <- aggregate(output$value > 0.05, list(output$sample.size, output$dist, output$test), table)
+
+df$rejected <- rep(NA, length(df$x))
+df$not_rejected <- rep(NA, length(df$x))
+for(i in 1:length(df$x)){
+  df$rejected[i] <- unlist(df[ , "x"][i])[1]
+  df$not_rejected[i] <- unlist(df[ , "x"][i])[2]
+}
+
+df$rejected <- ifelse(is.na(df$rejected), 0, df$rejected)
+df$not_rejected <- ifelse(is.na(df$not_rejected), 0, df$not_rejected)
+df$power_type1 <- with(df, rejected / (rejected + not_rejected))
+    names(df) <- c("sample.size", "dist", "test", "x", "rejected", "not_rejected", "power_type1")
+
+ggplot(df[-grep("norm", df$dist), ], aes(x = sample.size, y = power_type1, colour = factor(test))) +
+  geom_smooth() +
+  geom_point() +
+  facet_wrap(~ dist)
+@
+\caption{test caption}
+\label{power_monte_carlo}
 \end{figure}
 
 \end{document}
