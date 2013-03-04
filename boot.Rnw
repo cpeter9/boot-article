@@ -314,7 +314,7 @@ Comparisons of the four test statistics for power and Type 1 error are made by w
 Tests for normality setup and test the hypothesis test below:
 
 \begin{align}
-H_0&: \text{The sample comes from a normally distributed population}
+H_0&: \text{The sample comes from a normally distributed population}\\
 H_A&: \text{The sample comes from a population that is not normally distributed}
 \end{align}
 
@@ -328,11 +328,13 @@ Figure~\ref{type1_monte_carlo} shows Type 1 error rates by test by sample size. 
 
 Statistical power is a second important concern when it comes to administering tests for departures from normality.  Power, also called the inverse of Type II error rate is the ability of a statistical test to reject the null hypothesis in the presence of a state that in which the null hypothesis should be rejected.  Statistical power is also refered as the ability of a test to detect that which is represented by the alternative hypothesis.  Figure~\ref{power_monte_carlo} shows statistical power for each statistical test by sample size.
 
-Statistical tests for departure from normality were assessed over three distributions: chi-square, gamma, and uniform.  The Shapiro-Wilk test appears to have the best power among the three tests for use on the chi-square and gamma distribution.  The Kolmolgrov-Smirnov test has nearly perfect power against the uniform distribution from sample size 10.  The Jaruq-Bera test presents results that are expected against the chi-square and gamma distributions, but has a strange binomial swing in power as applied to the uniform distribution.  In all three tests, the Shapiro-Wilk test appears to dominate the Anderson-Darling test.
+Statistical tests for departure from normality were assessed over three distributions: chi-square, gamma, and uniform.  The Shapiro-Wilk test appears to have the best power among the three tests for use on the chi-square and gamma distribution.  The Kolmolgrov-Smirnov test has nearly perfect power against the uniform distribution from sample size 10.  The Jaruq-Bera test presents results that are expected against the chi-square and gamma distributions, but has a strange binomial swing in power as applied to the uniform distribution.  In all three tests, the Shapiro-Wilk test appears to dominate the Anderson-Darling and Jarque-Bera tests.
 
-The Shapiro-Wilk test appears to be the majority winner among the three distributions that was applied against each test.  The test reaches nearly pefect power against the chi-square around 50 observations and around 75 against the gamma distribution.
+The Shapiro-Wilk test appears to be the majority winner among the three distributions applied to test.  The test reaches nearly pefect power against the chi-square around 50 observations and around 75 against the gamma distribution.
 
-Interestingly, the Kolmogrov-Smirnov test appears to have very low power against the chi-square and gamma distributions as specified, but nearly perfect power against the uniform distribution.  The KS test is noted to have relativley low power in the literature.
+Interestingly, the Kolmogrov-Smirnov test appears to have very low power against the chi-square and gamma distributions as specified, but nearly perfect power against the uniform distribution.  The KS test is noted to have relativley low power in the literature~\citep{razali2011power}.
+
+The Jarque-Bera test ranks third out of the four other tests for power applied to the $\chi^2$ and gamma generated data.  The test  converges to perfect power rather slowly in the instance of unifromly distributed random data.  By 100 observations, the test has acheived only about 60\% power, while all other tests have achieved nearly perfect power.
 
 
 
@@ -346,10 +348,11 @@ Interestingly, the Kolmogrov-Smirnov test appears to have very low power against
 \section{Appendix A}
 
 \begin{figure}[h!]
-<<fig_1, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='3in', out.height='3in', cache=FALSE>>=
+<<fig_1, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', out.height='5in', cache=TRUE>>=
 library(ggplot2)
 library(reshape2)
 library(tikzDevice)
+library(ggthemes)
 
 data <- read.csv("C:/R_stuff/school/article/data.csv")
 
@@ -362,14 +365,25 @@ raw.samples <- melt(raw.samples)
 
 ggplot(raw.samples, aes(x = value)) +
   geom_histogram(aes(y = ..density..)) +
-  facet_grid(variable ~ . )
+  facet_grid(variable ~ . ) +
+  xlab("Tokens Earned") +
+  ylab("Density") +
+  scale_x_continuous(breaks = seq(0, 50, 2), limit = c(0, 30)) +
+  theme_few() +
+  theme(strip.text = element_text(size = 24),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 20)) +
+  stat_function(fun = dnorm,
+              args = c(mean = mean(raw.samples$value),
+                       sd = sd(raw.samples$value)),
+              colour = "blue", size = 1)
 @
-\caption{test caption}
+\caption{Histogram of token earning in two random samples.  Blue lines indicate the best fit normal distribution.}
 \label{fig:prob_1_raw_data}
 \end{figure}
 
 \begin{figure}[h!]
-<<type1error, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', out.height='3in', warning=FALSE, cache=TRUE>>=
+<<type1error, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='6in', out.height='4.5in', warning=FALSE, cache=TRUE>>=
 library(ggplot2)
 library(reshape2)
 library(tikzDevice)
@@ -423,9 +437,20 @@ output$sample.size <- seq(begin, end, move_by)
 
 ggplot(output, aes(x = sample.size, y = value, colour = variable)) +
   geom_smooth() +
-  geom_point()
+  geom_point() + 
+  xlab("Sample Size") +
+  ylab("Type 1 Error Rate") +
+  geom_hline(yintercept = 0.05, colour = "red", size = 1) +
+  theme_few() +
+  scale_x_continuous(limit = c(0, 910)) +
+  scale_colour_discrete(name = "Test Applied") + 
+  theme(strip.text = element_text(size = 24),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 20),
+        legend.title = element_text(size = 20),
+        legend.text = element_text(size = 16))
 @
-\caption{test caption}
+\caption{Type 1 Error rate by Sample Size for three tests for departures from normality: t-test equal variances, t-test unequal variances, WMW distribution-free test.}
 \label{type1error}
 \end{figure}
 
