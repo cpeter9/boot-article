@@ -116,7 +116,7 @@ $#1{AB}^\sigma$ $#1{H}^C$ $#1{\sin z}$ $#1{W}_n$}
 %  TITLE SECTION
 %----------------------------------------------------------------------------------------
 
-\title{\vspace{-15mm}\fontsize{24pt}{10pt}\selectfont\textbf{On Solving Applied Inference Problems Using Bootstrap and Simulation Models}} % Article title
+\title{\vspace{-15mm}\fontsize{24pt}{10pt}\selectfont\textbf{Using bootstrapping and Monte Carlo simulation to assess Type 1 Error rates and Test Power}} % Article title
 
 \author{
 \large
@@ -154,7 +154,7 @@ theme_set(theme_grey(base_size = 9))
 \newpage
 \begin{abstract}
 
-\noindent Much of what young statisticians in training learn in undergraduate and graduate school relies on large-sample asymptotic theory.  Well known statistics are calculated and with a few assumptions a standard error is developed to measure inference reliability.  Unfortunately data are not always sufficiently large such that finite sample properties match those required by large-sample asymptotics.  Additionally a careful examination of assumptions is always required for successful inference.  In some cases common checks of assumptions may not be possible with a high degree of power, especially in cases of  small samples.  One common solution to this problem involves resampling data with replacement to empirically calculate the variance of any statistic.  This solution is generally referred to as bootstrapping.  In addition to its uses for inference, variations on bootstrapping methods can be used to simulate data for cross-validation or other purposes.  This article will focus on three applications of bootstrapping.  The first is verification of power calculations for a simple experiment.  The second involves inference in the presence of heteroskedasticity.  The third focuses on bootstrapping for cross-validation.
+\noindent Much of what young statisticians in-training learn in undergraduate and graduate school relies on large-sample asymptotic theory.  Well known statistics are calculated and with a few assumptions a standard error is developed to measure inference reliability.  Unfortunately data are not always sufficiently large such that finite sample properties match those required by large-sample asymptotics.  In addition, a careful examination of assumptions is always required for successful inference.  In some cases common checks of assumptions may not be possible with a high degree of power, especially in cases of  small samples.  This analysis explores type 1 error rates and test power in two cases.  The first case is a comparison between the two-sample t-test and the Wilcoxon-Mann-Whitney (Mann U) test.  The second case compares four popular tests for departure from normality.  These tests include the Shapiro-Wilk tests, Kolmogorov-Smirnov test, Anderson-Darling test, and Jarque-Bera test.  Type 1 error is assessed by calculating rejection rates from Monte Carlo simulated normal distributions.  Power is assessed by calculating rejection rates corresponding to the uniform, gamma, and $\chi^2$ distributions.
 
 \end{abstract}
 
@@ -162,11 +162,11 @@ theme_set(theme_grey(base_size = 9))
 %   ARTICLE CONTENTS
 %----------------------------------------------------------------------------------------
 
-\section{Verification of power calculations}
+\section{A comparison of the two-sample t-test and Wilcoxon-Mann-Witney test}
 
-Power calculations are generally considered good pre-requisite for any designed experiment.  Such calculations allow researchers to determine reasonable sample size requirements before carrying out an experiment.  Such calculations can help researchers avoid carrying out experiments doomed in the sense of statistical detection before experimentation begins.
+Power calculations are generally considered good pre-requisite for any designed experiment.  Such calculations allow researchers to determine reasonable sample size requirements before carrying out an experiment.  These calculations can help researchers avoid carrying out experiments doomed in the sense of statistical detection before experimentation begins.
 
-The following example takes a look at how power calculations can be carried out and verified by bootstrapping sample data.  In this case a web app company wants to perform an experiment on a business practice.  The company has found a relationship between earning tokens on the site and customer longevity and financial value.  The company decides that it would like to encourage its customers to earn more tokens by sending an email.  However, the company would also like to compare the effect of the email against a control group of customers that did not receive the email.  A two-sample t-test is selected to test for a difference between the mean number of tokens earned in the experiment group and control group.
+The following example takes a look at how power calculations can be carried out and verified by Monte Carlo simulation and bootstrapping sample data.  In this case a web app company wants to perform an experiment on a business practice.  The company has found a relationship between earning tokens on the site and customer longevity and financial value.  The company decides that it would like to encourage its customers to earn more tokens by sending an email.  However, the company would also like to compare the effect of the email against a control group of customers that did not receive the email.  A two-sample t-test is selected to test for a difference between the mean number of tokens earned in the experiment group and control group.
 
 A major assumption underlying the two-sample t-test is that the two samples from come from normally distributed populations.  When this assumption is violated, distribution-free tests such as the Wilcoxon-Mann-Whitney (WMW or Mann-Witney U) test are commonly 
 used \citep{skovlund01}. It is well known that the two-sample t-test is robust to departures from normality when data are large, but how large?
@@ -179,7 +179,8 @@ The standard two-sample t-test is shown below:
 t &= \frac{\widebar{Y_1} - \widebar{Y_2}}{s_p\sqrt{\frac{1}{n_1} + \frac{1}{n_2}}}
 \end{align}
 
-The WMW statistic is calculated as follow:
+\newpage
+The WMW statistic is calculated as follows:
 
 \begin{align}
 W &= \frac{\sum_{i=0}^{m-1}\sum_{j=0}^{n-1}I(x_i, y_j)}{mn} && \text{where}\\
@@ -190,17 +191,17 @@ I(x_i, y_i) &=
   \end{array}
 \end{align}
 
-The {\it W} statistic as formulated above is an estimator of P$\left[X > Y\right]$.\\
+The {\it W} statistic as formulated above is an estimator of P$\left[X > Y\right]$.
 
 
 In order to assess power and type 1 error rates by sample size:
 \begin{enumerate}
 \item Take two random samples of the target data with replacement with for sample sizes $10\ldots 1010$ by 10.
-\item Calculate p-value and store
+\item Administer respective test, calculate p-value and store
 \item Repeat steps 1 and 2 {\it B} times.  In this case 200 bootstrap samples were taken for each sample and 200 p-values were calculated.
 \end{enumerate}
 
-To prove the method, Figure~\ref{type1error} shows type 1 error rate for two random samples from a normal distribution with mean $=$ 4 and standard deviations of 1 and 3, respectively for sample a and sample b bootstraps.  The error rates for the t-test procedure assuming equal variances is exactly the same as that not assuming equal variances.  These error rates are centered around 0.05 as expected.  However, interestingly, these error rates do not appear to be exact nor depend on sample size.  The WMW test maintains an almost universally higher Type 1 error rate compared to the two t-tests except in samples of less than 30.
+To prove the method, Figure~\ref{type1error} shows type 1 error rate for two random samples from a normal distribution with mean $=$ 4 and standard deviations of 1 and 3, respectively for `sample a' and `sample b' bootstraps.  The error rates for the t-test procedure assuming equal variances is exactly the same as that not assuming equal variances.  These error rates are centered around 0.05 as expected.  However, interestingly, these error rates do not appear to be exact nor depend on sample size.  The WMW test maintains an almost universally higher Type 1 error rate compared to the two t-tests except in samples of less than 30.
 
 Power can also be assessed by bootstrapping.  The bootstrapping procedure was modified to select two random samples: one from a normal distribution with mean of 4 and standard deviation of 1, and a second sample from a normal distribution with mean 4.4 (10\% higher) and a standard deviation of 3.  Figure~\ref{prob_1_power} shows the share of bootstrapped samples for which the null hypothesis of no difference was rejected for each test by sample size.  Power is low for all tests starting with a sample size of 10.  As the selected sample sizes grow, power increases for all three tests with both variations of the t-test showing identical power.  As sample sizes grow larger than 100, t-tests noticeably out perform the WMW test.  Interestingly, power between the t-tests and the WMW test appears to converge around sample size 900 (observations).
 
@@ -225,7 +226,7 @@ Power calculations were also performed for all three test variations on the comp
 
 
 
-\section{Using bootstrapping to test for normality in small samples}
+\section{Using Monte Carlo simulations and bootstrapping to test for normality in small samples}
 
 Normality is a common assumption across many statistical procedures such as Analysis of Variance (ANOVA), linear regression, t-tests and z-tests.  When normality assumptions are violated, statistics that make up the aforementioned methods are not valid and may leader to incorrect inference.  There are two main ways that normality is commonly assessed: graphical methods, including histograms plotted against densities and Q-Q plots.  The second method involves the use of one of a number of statistical tests for normality.
 
