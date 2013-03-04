@@ -348,7 +348,7 @@ The Jarque-Bera test ranks third out of the four other tests for power applied t
 \section{Appendix A}
 
 \begin{figure}[h!]
-<<fig_1, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', out.height='5in', cache=TRUE>>=
+<<fig_1, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='6in', out.height='5in', cache=TRUE>>=
 library(ggplot2)
 library(reshape2)
 library(tikzDevice)
@@ -383,7 +383,7 @@ ggplot(raw.samples, aes(x = value)) +
 \end{figure}
 
 \begin{figure}[h!]
-<<type1error, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='6in', out.height='4.5in', warning=FALSE, cache=TRUE>>=
+<<type1error, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='6in', out.height='5in', warning=FALSE, cache=TRUE>>=
 library(ggplot2)
 library(reshape2)
 library(tikzDevice)
@@ -456,10 +456,12 @@ ggplot(output, aes(x = sample.size, y = value, colour = variable)) +
 
 
 \begin{figure}[h!]
-<<power, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', out.height='3in', warning=FALSE, cache=TRUE>>=
+<<power, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5.5in', out.height='5in', warning=FALSE, cache=TRUE>>=
 library(ggplot2)
 library(reshape2)
 library(tikzDevice)
+library(ggthemes)
+
 
 B <- 200
 t_p_vals <- rep(NA, B)
@@ -510,17 +512,29 @@ output$sample.size <- seq(begin, end, move_by)
 
 ggplot(output, aes(x = sample.size, y = value, colour = variable)) +
   geom_smooth() +
-  geom_point()
+  geom_point() +
+  xlab("Sample Size") +
+  ylab("Test Power") +
+  geom_hline(yintercept = 1, colour = "red", size = 1) +
+  theme_few() +
+  scale_x_continuous(limit = c(0, 910)) +
+  scale_colour_discrete(name = "Test Applied", labels = c("t-test eq. variances", "t-test uneq. variances", "WMW Test")) + 
+  theme(strip.text = element_text(size = 24),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 20),
+        legend.title = element_text(size = 20),
+        legend.text = element_text(size = 16))
 @
-\caption{test caption}
+\caption{Above is a power comparison of three tests: t-test equal variances, t-test unequal variances, and the WMW test as applied to detect differences in two randomly-generated normally distributed variables with 10\% difference.}
 \label{prob_1_power}
 \end{figure}
 
 \begin{figure}[h!]
-<<raw_data_type_1, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', out.height='3in', warning=FALSE, cache=TRUE>>=
+<<raw_data_type_1, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5.5in', out.height='5in', warning=FALSE, cache=TRUE>>=
 library(ggplot2)
 library(reshape2)
 library(tikzDevice)
+library(ggthemes)
 
 data <- read.csv("C:/R_stuff/school/article/data.csv")
 
@@ -566,17 +580,29 @@ output$sample.size <- seq(begin, end, move_by)
 
 ggplot(output, aes(x = sample.size, y = value, colour = variable)) +
   geom_smooth() +
-  geom_point()
+  geom_point() +
+  xlab("Sample Size") +
+  ylab("Type 1 Error Rate") +
+  geom_hline(yintercept = 0.05, colour = "red", size = 1) +
+  theme_few() +
+  scale_x_continuous(limit = c(0, 910)) +
+  scale_colour_discrete(name = "Test Applied", labels = c("t-test eq. variances", "t-test uneq. variances", "WMW Test")) + 
+  theme(strip.text = element_text(size = 24),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 20),
+        legend.title = element_text(size = 20),
+        legend.text = element_text(size = 16))
 @
-\caption{test caption}
+\caption{Type 1 error rates applied to actual Token data.  Each point represents 200 bootstrap samples.}
 \label{raw_data_type_1}
 \end{figure}
 
 \begin{figure}[h!]
-<<raw_data_power, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', out.height='3in', warning=FALSE, cache=TRUE>>=
+<<raw_data_power, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5.5in', out.height='4.75in', warning=FALSE, cache=TRUE>>=
 library(ggplot2)
 library(reshape2)
 library(tikzDevice)
+library(ggthemes)
 
 data <- read.csv("C:/R_stuff/school/article/data.csv")
 
@@ -618,18 +644,31 @@ output$sample.size <- seq(begin, end, move_by)
 
 ggplot(output, aes(x = sample.size, y = value, colour = variable)) +
   geom_smooth() +
-  geom_point()
+  geom_point() +
+  xlab("Sample Size") +
+  ylab("Test Power") +
+  geom_hline(yintercept = 1, colour = "red", size = 1) +
+  theme_few() +
+  scale_x_continuous(limit = c(0, 910)) +
+  scale_colour_discrete(name = "Test Applied", labels = c("t-test eq. variances", "t-test uneq. variances", "WMW Test")) + 
+  theme(strip.text = element_text(size = 24),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 20),
+        legend.title = element_text(size = 20),
+        legend.text = element_text(size = 16))
 @
-\caption{test caption}
+\caption{Test power applied to actual Token data with one sample left as-is and the other scaled by 1.1.}
 \label{raw_data_power}
 \end{figure}
 
 
 \begin{figure}[h!]
-<<dists, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', out.height='3in', warning=FALSE, cache=TRUE>>=
+<<dists, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5.5in', out.height='5in', warning=FALSE, cache=TRUE>>=
 library(ggplot2)
 library(reshape2)
 library(tikzDevice)
+library(ggthemes)
+
 sample.size <- 10000
 
 # Various normal distributions
@@ -650,19 +689,28 @@ dists <- melt(dists)
 ggplot(dists, aes(x = value)) +
   geom_density(fill = "blue", alpha = 0.5) +
   scale_x_continuous(limits = c(-10, 10)) +
+  ylab("Density") +
+  xlab("") +
   facet_wrap( ~ variable) +
-stat_function(fun = dnorm,
+  stat_function(fun = dnorm,
               args = c(mean = 0,
                        sd = 1),
-              colour = "red", size = 2)
+              colour = "red", size = 2) +
+  theme_few() +
+  theme(strip.text = element_text(size = 20),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 20),
+        legend.title = element_text(size = 20),
+        legend.text = element_text(size = 16),
+        axis.text.x = element_blank())
 @
-\caption{test caption}
+\caption{Distributions for which Type 1 error rates and test power are analyzed.}
 \label{dists}
 \end{figure}
 
 
 \begin{figure}[h!]
-<<type1, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', out.height='3in', warning=FALSE, cache=TRUE>>=
+<<type1, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5.5in', out.height='5in', warning=FALSE, cache=TRUE>>=
 # Loop over small sample sizes
 library(ggplot2)
 library(reshape2)
@@ -776,14 +824,24 @@ df$power_type1 <- with(df, rejected / (rejected + not_rejected))
 
 ggplot(df[grep("norm", df$dist), ], aes(x = sample.size, y = power_type1, colour = factor(dist))) +
   geom_smooth() +
-  facet_wrap(~ test)
+  geom_hline(yintercept = 0.05, size = 1, colour = "red") +
+  facet_wrap(~ test) +
+  theme_few() +
+  ylab("Type 1 Error") +
+  xlab("Sample Size") +
+  scale_colour_discrete(name = "Distributions", label = c("Standard Normal", "Normal with variance 9", "Normal with variance 0.25")) +
+  theme(strip.text = element_text(size = 24),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 20),
+        legend.title = element_text(size = 20),
+        legend.text = element_text(size = 16))
 @
-\caption{test caption}
+\caption{Type 1 error rates as calculated by Monte Carlo simulation with 1,000 replications at each sample size.}
 \label{type1_monte_carlo}
 \end{figure}
 
 \begin{figure}[h!]
-<<power_test, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='5in', out.height='3in', warning=FALSE, cache=TRUE>>=
+<<power_test, echo=FALSE, fig=TRUE, sanitize=TRUE, out.width='6in', out.height='4.5in', warning=FALSE, cache=TRUE>>=
 # Loop over small sample sizes
 library(ggplot2)
 library(reshape2)
@@ -795,7 +853,7 @@ library(tseries)
 smallest.size <- 10
 largest.size <- 100
 size.by <- 5
-boot.size <- 1000
+boot.size <- 10
 
 for(i in c(".sw", ".ks", ".ad", ".jb")){ # create fill vectors to put bootstapped p-values in
   norm <- rep(NA, boot.size)
@@ -898,9 +956,20 @@ df$power_type1 <- with(df, rejected / (rejected + not_rejected))
 ggplot(df[-grep("norm", df$dist), ], aes(x = sample.size, y = power_type1, colour = factor(test))) +
   geom_smooth() +
   geom_point() +
-  facet_wrap(~ dist)
+  geom_hline(yintercept = 1, colour = "red", size = 0.5) +
+  scale_y_continuous(limits = c(0, 1)) +
+  facet_wrap(~ dist) +
+  ylab("Test Power") +
+  xlab("Sample Size") +
+  scale_colour_discrete(name = "Test", labels = c("AD", "JB", "KS", "SW")) + 
+  theme_few() +
+  theme(strip.text = element_text(size = 20),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 20),
+        legend.title = element_text(size = 20),
+        legend.text = element_text(size = 16))
 @
-\caption{test caption}
+\caption{Test power by non-normal distribution.  Each test was applied 1,000 times at each sample size for each test of departure from normality.}
 \label{power_monte_carlo}
 \end{figure}
 
