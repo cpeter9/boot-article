@@ -80,7 +80,7 @@ $#1{AB}^\sigma$ $#1{H}^C$ $#1{\sin z}$ $#1{W}_n$}
 
 \usepackage[sc]{mathpazo} % Use the Palatino font
 \usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
-\linespread{1.05} % Line spacing - Palatino needs more space between lines
+\linespread{2} % Line spacing - Palatino needs more space between lines
 \usepackage{microtype} % Slightly tweak font spacing for aesthetics
 
 \usepackage[hmarginratio=1:1,top=32mm,columnsep=20pt]{geometry} % Document margins
@@ -309,6 +309,23 @@ The Jarque-Bera test is very simple to compute and measures sample kurtosis and 
 \subsubsection{Monte Carlo simulation}
 
 Comparisons of the four test statistics for power and Type 1 error are made by way of Monte Carlo simulation bootstrapped by sample size.  Six hypothetical distributions of random variables were chosen for the analysis and appear in Figure~\ref{dists} in Appendix A.  The distributions include three normal distributions: one standard normal, one normal distribution $(\mu = 0,~ \sigma^2 = 1)$ with wide variance ($\mu = 0,~\sigma^2 = 3$), and one normal distribution with smaller than standard variance $(\mu = 0,~\sigma^2 = 0.25)$.  Three non-normal distributions are also examined: one uniform distribution $[0,~1]$, one $\chi^2$ distribution $(df = 3)$ and a gamma distribution $(\text{shape} = 2,~\text{scale} = 2)$.\\
+
+Tests for normality setup and test the hypothesis test below:
+
+\begin{align}
+H_0&: \text{The sample comes from a normally distributed population}\\
+H_A&: \text{The sample comes from a population that is not normally distributed}
+\end{align}
+
+Unfortunately, many practitioners neglect the significance of normality assumed as the null hypothesis.  Tests of normality actually test for departures from normality.  Therefore normality is never ``proved'' or accepted as the null hypothesis is never accepted.  Contrary, the alternative hypothesis, only a departure from normality can be accepted statistically.  This confusion leads many young practioners to apply their favorite test, note that the probability value is less than 0.05 and continue on with Analysis of Variance or linear regression, etc.  Not only do many (especially young) practitioners reverse the hypotheses, but if they do setup the hypotheses correctly, the second error of claiming to have ``proved'' normality is common.\\
+
+Type 1 error rates are special consideration in this analysis.  Type 1 error occurs when a practitioner rejects the null hypothesis when the hypothesis is indeed true.  In this case, that would mean that the underlying population distribution is normally distributed, but the practitioner is lead to reject the null hypothesis and accept the alternative hypothesis that the sample came from a population that was not normally distributed.\\
+
+Monte Carlo simulation can be used to measure Type 1 error rates by drawing random numbers known to be normally distributed.  In this analysis 1,000 separate samples are collected for each distribution.  The sample sizes range from 10 to 1,000 in increments of 5.  In total 792,000 samples are taken with 401,980,000 simulated observations.  For Type 1 error rate analysis we focus on the numbers generated from known normal distributions.  As mentioned above, there are three such classes generated: standard normal, normal with wide variance, and normal with thin variance.  By looking at the share of cases where the null hypothesis is rejected by each test by each sample size, we can calculate Type 1 error rates.\\
+
+Figure~\ref{type1_monte_carlo} shows Type 1 error rates by test by sample size.  The Shapiro-Wilk, Kolmogrov-Smirnov, and Anderson-Darling tests all appear to have Type 1 error rates that are well controlled around 5\% (as specified).  The Jarque-Bera test's Type 1 error rates are surprisingly lower than 5\% in samples smaller than 50 observations.  The JB Type 1 error rates increase from 10 through about 75 observations at which point they flatten out around 4\%.  This is perhaps not as surprising as it may seem as the Jarque-Bera is a relatively simple test, seemingly constructed more for ease of use rather than precise error control.\\
+
+
 
 
 
